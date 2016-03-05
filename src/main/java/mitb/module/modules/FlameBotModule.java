@@ -1,6 +1,7 @@
 package mitb.module.modules;
 
 import mitb.event.EventHandler;
+import mitb.event.Listener;
 import mitb.event.events.JoinEvent;
 import mitb.module.Module;
 
@@ -9,6 +10,7 @@ import mitb.module.Module;
  */
 public class FlameBotModule extends Module {
 
+    @Listener
     public void onJoin(JoinEvent event) {
         org.pircbotx.hooks.events.JoinEvent evt = event.getOriginalEvent();
         if(!evt.getUser().getNick().equals(evt.getBot().getNick()) && evt.getUser().getNick().toLowerCase().endsWith("bot")) {
