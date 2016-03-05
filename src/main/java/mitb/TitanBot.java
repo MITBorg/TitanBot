@@ -26,6 +26,7 @@ import java.util.List;
  * Main class for TitanBot. Handles the main functionality of the bot.
  */
 public class TitanBot {
+
     public static final Logger LOGGER = LoggerFactory.getLogger(TitanBot.class);
     public static final RateLimiter RATE_LIMITER = RateLimiter.create(Double.parseDouble(Properties.getValue("rate")));
     public static final List<Module> MODULES = new ArrayList<>();
@@ -67,7 +68,7 @@ public class TitanBot {
      * @param reply message we should send.
      */
     public static void sendReply(GenericEvent event, String reply) {
-        if(RATE_LIMITER.tryAcquire()) {
+        if (RATE_LIMITER.tryAcquire()) {
             event.respond(reply);
         }
     }
@@ -80,6 +81,8 @@ public class TitanBot {
         MODULES.add(new LastSeenModule());
         MODULES.add(new StatsModule());
         MODULES.add(new UrbanDictionaryModule());
+        MODULES.add(new HelpModule());
+        MODULES.add(new SedReplacementModule());
         MODULES.add(new WeatherModule());
 
         LOGGER.info("Registered all modules.");
