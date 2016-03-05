@@ -13,6 +13,7 @@ import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
 import org.pircbotx.cap.TLSCapHandler;
+import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.types.GenericEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +53,7 @@ public class TitanBot {
                 .setSocketFactory(new UtilSSLSocketFactory().trustAllCertificates())
                 .setAutoNickChange(true)
                 .setAutoReconnect(true)
-                .setAutoSplitMessage(true)
-                .setMaxLineLength(512)
+                .setAutoSplitMessage(false)
                 //.addAutoJoinChannel("#mopar")
                 .addListener(new IRCListener())
                 .addCapHandler(new TLSCapHandler((SSLSocketFactory) SSLSocketFactory.getDefault(), true))
@@ -65,14 +65,66 @@ public class TitanBot {
     }
 
     /**
-     * Send a rate-limited reply to the channel.
+     * Send a rate-limited reply to the channel
      *
      * @param event event we should reply to
      * @param reply message we should send.
      */
     public static void sendReply(GenericEvent event, String reply) {
+        TitanBot.sendReply(event, reply, "");
+    }
+
+    /**
+     * Send a rate-limited reply to the channel with a suffix if it is truncated to 3 lines.
+     *
+     * @param event event we should reply to
+     * @param reply message we should send.
+     */
+    public static void sendReply(GenericEvent event, String reply, String truncatedText) {
         if (RATE_LIMITER.tryAcquire()) {
-            event.respond(reply);
+            if (event instanceof MessageEvent) {
+                MessageEvent messageEvent = (MessageEvent) event;
+
+                String prefix = "PRIVMSG " + messageEvent.getChannelSource() + " :" + messageEvent.getUser().getNick() + ": ";
+                String suffix = "\r\n";
+
+                int wrapLength = 450 - suffix.length() - prefix.length();
+
+                int offset = 0;
+                List<String> resultBuilder = new ArrayList<>();
+
+                while ((reply.length() - offset) > wrapLength) {
+                    if (reply.charAt(offset) == ' ') {
+                        offset++;
+                        continue;
+                    }
+
+                    int spaceToWrapAt = reply.lastIndexOf(' ', wrapLength + offset);
+                    // if the next string with length maxLength doesn't contain ' '
+                    if (spaceToWrapAt < offset) {
+                        spaceToWrapAt = reply.indexOf(' ', wrapLength + offset);
+                        // if no more ' '
+                        if (spaceToWrapAt < 0) {
+                            break;
+                        }
+                    }
+
+                    resultBuilder.add(reply.substring(offset, spaceToWrapAt));
+                    offset = spaceToWrapAt + 1;
+                }
+
+                resultBuilder.add(reply.substring(offset));
+                if (resultBuilder.size() > 2) {
+                    if (resultBuilder.size() > 3) {
+                        resultBuilder.set(2, resultBuilder.get(2).substring(0, resultBuilder.get(2).length() - truncatedText.length()) + truncatedText);
+                    }
+
+                    resultBuilder = resultBuilder.subList(0, 3);
+                }
+                resultBuilder.forEach((s) -> event.getBot().sendRaw().rawLine(prefix + s));
+            } else {
+                event.respond(reply);
+            }
         }
     }
 

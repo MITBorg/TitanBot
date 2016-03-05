@@ -7,6 +7,7 @@ import mitb.event.events.MessageEvent;
 import mitb.event.events.PrivateMessageEvent;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.InviteEvent;
+import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.output.OutputIRC;
 
 import java.util.regex.Matcher;
@@ -33,8 +34,8 @@ public class IRCListener extends ListenerAdapter {
     public void onMessage(org.pircbotx.hooks.events.MessageEvent event) {
         EventHandler.trigger(new MessageEvent(event));
 
-        if (event.getMessage().startsWith(event.getBot().getNick())) {
-            Pattern pattern = Pattern.compile(event.getBot().getNick() + ".? (.*)");
+        if (event.getMessage().toLowerCase().startsWith(event.getBot().getNick().toLowerCase())) {
+            Pattern pattern = Pattern.compile(event.getBot().getNick() + ".? (.*)", Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(event.getMessage());
 
             if (matcher.find()) {
@@ -52,5 +53,12 @@ public class IRCListener extends ListenerAdapter {
     public void onPrivateMessage(org.pircbotx.hooks.events.PrivateMessageEvent event) {
         EventHandler.trigger(new PrivateMessageEvent(event));
         EventHandler.trigger(new CommandEvent(event.getMessage(), event));
+    }
+
+    @Override
+    public void onJoin(JoinEvent event) {
+        if(!event.getUser().getNick().equals(event.getBot().getNick()) && event.getUser().getNick().toLowerCase().endsWith("bot")) {
+            event.respond("im better than u scrublord");
+        }
     }
 }

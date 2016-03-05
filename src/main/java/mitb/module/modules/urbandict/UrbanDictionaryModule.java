@@ -96,7 +96,8 @@ public class UrbanDictionaryModule extends CommandModule {
                         UrbanDictionaryQuery entry = new Gson().fromJson(body, UrbanDictionaryQuery.class);
 
                         if (entry.getList().size() > finalEntryNo) {
-                            TitanBot.sendReply(event.getOriginalEvent(), formatUrbanDictionaryQuery(entry, finalEntryNo));
+                            TitanBot.sendReply(event.getOriginalEvent(), formatUrbanDictionaryQuery(entry, finalEntryNo),
+                                    "... more at " + entry.getList().get(finalEntryNo).getPermalink());
                         } else {
                             String position = entryValue.isCustomEntry() ? " [at " + (finalEntryNo + 1) + "]" : "";
                             TitanBot.sendReply(event.getOriginalEvent(), "There are no entries for: " + query + position);
