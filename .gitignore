@@ -27,3 +27,4 @@ fabric.properties
 *.iml
 logs/
 target/
+database.db
