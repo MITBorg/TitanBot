@@ -6,6 +6,7 @@ import mitb.event.EventHandler;
 import mitb.irc.IRCListener;
 import mitb.module.Module;
 import mitb.module.modules.*;
+import mitb.module.modules.urbandict.UrbanDictionaryModule;
 import mitb.module.modules.weather.WeatherModule;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;

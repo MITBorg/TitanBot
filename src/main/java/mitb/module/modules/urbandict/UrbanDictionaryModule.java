@@ -1,16 +1,14 @@
-package mitb.module.modules;
+package mitb.module.modules.urbandict;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonArray;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
 import com.google.common.base.Joiner;
+import com.google.gson.Gson;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
 import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
+import mitb.module.modules.urbandict.json.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -38,7 +36,7 @@ public class UrbanDictionaryModule extends CommandModule {
 
     @Override
     public String[] getCommands() {
-        return new String[]{"urban", "urbandictionary", "ub"};
+        return new String[]{"urban", "urbandictionary", "ub", "ud"};
     }
 
     @Override
@@ -92,12 +90,12 @@ public class UrbanDictionaryModule extends CommandModule {
                     public Response onCompleted(Response response) throws Exception {
                         // Parsing response
                         String body = response.getResponseBody();
-                        JsonArray listNode = Json.parse(body).asObject().get("list").asArray();
 
                         // Evaluating response
-                        if (listNode.size() > finalEntryNo) {
-                            UrbanDictionaryEntry entry = UrbanDictionaryEntry.getEntry(listNode.get(finalEntryNo));
-                            TitanBot.sendReply(event.getOriginalEvent(), entry.toString());
+                        UrbanDictionaryQuery entry = new Gson().fromJson(body, UrbanDictionaryQuery.class);
+
+                        if (entry.getList().size() > finalEntryNo) {
+                            TitanBot.sendReply(event.getOriginalEvent(), formatUrbanDictionaryQuery(entry, finalEntryNo));
                         } else {
                             String position = entryValue.isCustomEntry() ? " [at " + (finalEntryNo + 1) + "]" : "";
                             TitanBot.sendReply(event.getOriginalEvent(), "There are no entries for: " + query + position);
@@ -107,7 +105,7 @@ public class UrbanDictionaryModule extends CommandModule {
 
                     @Override
                     public void onThrowable(Throwable t) {
-                        // Something wrong happened.
+                        // XXX output error
                     }
                 });
     }
@@ -125,6 +123,28 @@ public class UrbanDictionaryModule extends CommandModule {
     @Override
     public void register() {
 
+    }
+
+    /**
+     * Formats output for urban dictionary queries.
+     * @param q
+     * @param entryNo
+     * @return
+     */
+    public String formatUrbanDictionaryQuery(UrbanDictionaryQuery q, int entryNo) {
+        List l = q.getList().get(entryNo);
+        return String.format("%s: %s [by %s +%d/-%d]",
+                wrapBold(l.getWord()), l.getDefinition().replaceAll("\r", "").replaceAll("\n", " "),
+                l.getAuthor(), l.getThumbsUp(), l.getThumbsDown());
+    }
+
+    /**
+     * Wraps some string in bold.
+     * @param s
+     * @return
+     */
+    private static String wrapBold(String s) {
+        return BOLD + s + BOLD;
     }
 
 
@@ -149,91 +169,6 @@ public class UrbanDictionaryModule extends CommandModule {
 
         public int getEntryNumber() {
             return entryNumber;
-        }
-    }
-
-    /**
-     * An UrbanDictionary entry.
-     */
-    static final class UrbanDictionaryEntry {
-
-        private String definition;
-        private String author;
-        private String word;
-        private String example;
-        private String link;
-        private String currentVote;
-        private int defId;
-        private int thumbsUp;
-        private int thumbsDown;
-
-        private UrbanDictionaryEntry(String definition, String author, String word, String example, String link,
-                                     String currentVote, int defId, int thumbsUp, int thumbsDown) {
-            this.definition = definition;
-            this.author = author;
-            this.word = word;
-            this.example = example;
-            this.link = link;
-            this.currentVote = currentVote;
-            this.defId = defId;
-            this.thumbsUp = thumbsUp;
-            this.thumbsDown = thumbsDown;
-        }
-
-        public static UrbanDictionaryEntry getEntry(JsonValue item) {
-            JsonObject obj = item.asObject();
-            String def = obj.getString("definition", "Unknown Description");
-            String link = obj.getString("permalink", "Unknown Link");
-            int thumbsUp = obj.getInt("thumbs_up", 0);
-            String author = obj.getString("author", "Unknown Author");
-            String word = obj.getString("word", "Unknown Word");
-            int defId = obj.getInt("defid", -1);
-            String currentVote = obj.getString("current_vote", "Unknown Current Vote");
-            String example = obj.getString("example", "Unknown Example");
-            int thumbsDown = obj.getInt("thumbs_down", 0);
-            return new UrbanDictionaryEntry(def, author, word, example, link, currentVote, defId, thumbsUp, thumbsDown);
-        }
-
-        public String getDefinition() {
-            return definition.replaceAll("\r\n", " ");
-        }
-
-        public String getAuthor() {
-            return author;
-        }
-
-        public String getWord() {
-            return BOLD + word + BOLD;
-        }
-
-        public String getExample() {
-            return example;
-        }
-
-        public int getThumbsUp() {
-            return thumbsUp;
-        }
-
-        public int getThumbsDown() {
-            return thumbsDown;
-        }
-
-        public String getCurrentVote() {
-            return currentVote;
-        }
-
-        public String getLink() {
-            return link;
-        }
-
-        public int getDefId() {
-            return defId;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s: %s [by %s +%d/-%d]",
-                    getWord(), getDefinition(), getAuthor(), getThumbsUp(), getThumbsDown());
         }
     }
 }
