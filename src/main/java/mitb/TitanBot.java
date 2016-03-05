@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class TitanBot {
     public static final Logger LOGGER = LoggerFactory.getLogger(TitanBot.class);
-    public static final RateLimiter RATE_LIMITER = RateLimiter.create(0.4);
+    public static final RateLimiter RATE_LIMITER = RateLimiter.create(Double.parseDouble(Properties.getValue("rate")));
     public static final List<Module> MODULES = new ArrayList<>();
     public static Connection databaseConnection;
 
