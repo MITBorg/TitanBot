@@ -24,9 +24,17 @@ public class WeatherModule extends CommandModule {
      */
     private static final String BOLD = "\u0002";
     /**
-     * Degrees symbol;
+     * Degrees symbol.
      */
     private static final String DEGREES = "°";
+    /**
+     * Fahrenheit symbol.
+     */
+    private static final String FAHRENHEIT_SYMBOL = DEGREES + "F";
+    /**
+     * Celsius symbol.
+     */
+    private static final String CELSIUS_SYMBOL = DEGREES + "C";
 
     private static final String API_URL_PART_1 = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22";
     private static final String API_URL_PART_2 = "%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
@@ -100,7 +108,6 @@ public class WeatherModule extends CommandModule {
      * @return
      */
     private String formatWeatherQuery(Query query) {
-        // TODO convert units to users local system, between imperial and metric
         StringBuilder sb = new StringBuilder();
         Channel c = query.getResults().getChannel();
 
@@ -137,9 +144,17 @@ public class WeatherModule extends CommandModule {
 
         for (int i = 0; i < f.size(); i++) {
             Forecast forecast = f.get(i);
+
+            // Calculate temperatures
+            String highF = forecast.getHigh() + FAHRENHEIT_SYMBOL;
+            String lowF = forecast.getLow() + FAHRENHEIT_SYMBOL;
+            String highC = fahrenheitToCelsius(Integer.parseInt(forecast.getHigh())) + CELSIUS_SYMBOL;
+            String lowC = fahrenheitToCelsius(Integer.parseInt(forecast.getLow())) + CELSIUS_SYMBOL;
+
+            // Append data
             sb.append(forecast.getDay()).append(": ")
-                    .append("High is ").append(wrapBold(forecast.getHigh() + u.getTemperature()))
-                    .append(" Low is ").append(wrapBold(forecast.getLow() + u.getTemperature()))
+                    .append("High is ").append(wrapBold(highF + "/" + highC))
+                    .append(" Low is ").append(wrapBold(lowF + "/" + lowC))
                     .append(" Conditions are ").append(wrapBold(forecast.getText()));
 
             // Not adding a comma at the end
@@ -148,6 +163,15 @@ public class WeatherModule extends CommandModule {
             }
         }
         return sb.append(".").toString();
+    }
+
+    /**
+     * Converts a temperature in fahrenheit to celsius.
+     * @param f
+     * @return
+     */
+    private static int fahrenheitToCelsius(int f) {
+        return (((f-32)*5)/9);
     }
 
     /**
