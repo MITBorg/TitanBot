@@ -3,7 +3,7 @@ package mitb.module.modules;
 import mitb.TitanBot;
 import mitb.event.EventHandler;
 import mitb.event.Listener;
-import mitb.event.events.PrivateMessageEvent;
+import mitb.event.events.MessageEvent;
 import mitb.module.Module;
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ public class SedReplacementModule extends Module {
     private Map<String, String> cache = new HashMap<>();
 
     @Listener
-    public void onMessage(PrivateMessageEvent event) {
+    public void onMessage(MessageEvent event) {
         String msg = event.getOriginalEvent().getMessage();
         Pattern pattern = Pattern.compile("^(?:s/((?:[^\\\\/]|\\\\.)*)/((?:[^\\\\/]|\\\\.)*)/((?:g|i|\\d+)*))(?:;s/((?:[^\\\\/]|\\\\.)*)/((?:[^\\\\/]|\\\\.)*)/((?:g|i|\\d+)*))*$");
         Matcher matcher = pattern.matcher(msg);
@@ -37,7 +37,7 @@ public class SedReplacementModule extends Module {
                     msg = msg.replaceAll(matcher.group(4), matcher.group(5));
                 }
 
-                TitanBot.sendReply(event.getOriginalEvent(), nick + " meant: " + msg);
+                event.getOriginalEvent().respondWith(nick + " meant: " + msg);
             } else {
                 this.cache.put(nick, msg);
             }
