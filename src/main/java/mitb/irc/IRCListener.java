@@ -17,7 +17,7 @@ public class IRCListener extends ListenerAdapter {
     @Override
     public void onInvite(InviteEvent event) {
         new OutputIRC(event.getBot()).joinChannel(event.getChannel());
-        System.out.println("Invited to channel " + event.getChannel() + " by " + event.getUser().getNick() + "@" + event.getUser().getHostmask() + ". Joining.");
+        TitanBot.LOGGER.info("Invited to channel " + event.getChannel() + " by " + event.getUser().getNick() + "@" + event.getUser().getHostmask() + ". Joining.");
     }
 
     /**
@@ -27,6 +27,9 @@ public class IRCListener extends ListenerAdapter {
      */
     @Override
     public void onGenericMessage(GenericMessageEvent event) {
+        if(event.getMessage() == null || event.getMessage().isEmpty())
+            return; // i don't even know why these get triggered
+
         EventHandler.trigger(new MessageEvent(event));
     }
 }

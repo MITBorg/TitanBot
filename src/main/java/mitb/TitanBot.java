@@ -5,12 +5,10 @@ import mitb.event.EventHandler;
 import mitb.event.Listener;
 import mitb.event.events.MessageEvent;
 import mitb.irc.IRCListener;
-import org.apache.logging.log4j.message.Message;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
 import org.pircbotx.cap.TLSCapHandler;
-import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.types.GenericEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +26,6 @@ public class TitanBot {
      * Entry point to TitanBot.
      */
     public void run() throws Exception {
-        EventHandler.register(this);
-
         Configuration configuration = new Configuration.Builder()
                 .setName(Properties.getValue("bot.nick"))
                 .setLogin(Properties.getValue("bot.username"))
@@ -57,10 +53,5 @@ public class TitanBot {
         if(RATE_LIMITER.tryAcquire()) {
             event.respond(reply);
         }
-    }
-
-    @Listener(wants = MessageEvent.class)
-    public static void onMessage(MessageEvent e) {
-        TitanBot.sendReply(e.getOriginalEvent(), "lad stop talking");
     }
 }

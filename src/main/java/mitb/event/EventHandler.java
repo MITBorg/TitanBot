@@ -16,8 +16,7 @@ public class EventHandler {
 
         for(Method method : o.getClass().getMethods()) {
             if(method.isAnnotationPresent(Listener.class)) {
-                Listener annotation = method.getAnnotation(Listener.class);
-                list.put(method, annotation.wants());
+                list.put(method, (Class<? extends Event>) method.getParameterTypes()[0]);
             }
         }
 
@@ -28,7 +27,7 @@ public class EventHandler {
         eventListeners.entrySet().stream().forEach(entry -> {
             Map<Method, Class<? extends Event>> events = entry.getValue();
 
-            events.entrySet().stream().filter(e -> event.getClass().isAssignableFrom(e.getValue().getClass())).forEach(e -> {
+            events.entrySet().stream().filter(e -> e.getValue().isInstance(event)).forEach(e -> {
                 try {
                     e.getKey().invoke(entry.getKey(), event);
                 } catch(Exception e1) {
