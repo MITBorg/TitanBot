@@ -1,6 +1,5 @@
 package mitb.irc;
 
-import mitb.Properties;
 import mitb.TitanBot;
 import mitb.event.EventHandler;
 import mitb.event.events.CommandEvent;

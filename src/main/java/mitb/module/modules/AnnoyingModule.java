@@ -17,6 +17,6 @@ public class AnnoyingModule extends Module {
 
     @Listener
     public void onTalk(MessageEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Please just stop talking bro");
+        //TitanBot.sendReply(event.getOriginalEvent(), "Please just stop talking bro");
     }
 }

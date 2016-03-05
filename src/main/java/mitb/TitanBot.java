@@ -6,6 +6,7 @@ import mitb.event.EventHandler;
 import mitb.irc.IRCListener;
 import mitb.module.Module;
 import mitb.module.modules.AnnoyingModule;
+import mitb.module.modules.LastSeenModule;
 import mitb.module.modules.TestCommandModule;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
@@ -16,6 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLSocketFactory;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +30,18 @@ import java.util.List;
 public class TitanBot {
     public static final Logger LOGGER = LoggerFactory.getLogger(TitanBot.class);
     public static final RateLimiter RATE_LIMITER = RateLimiter.create(0.4);
-    public static final List<Module> modules = new ArrayList<>();
+    public static final List<Module> MODULES = new ArrayList<>();
+    public static Connection databaseConnection;
 
     /**
      * Entry point to TitanBot.
      */
     public void run() throws Exception {
+        databaseConnection = DriverManager.getConnection("jdbc:sqlite:database.db");
+
         EventHandler.register(new CommandHandler());
         this.registerModules();
+        this.createTables();
 
         Configuration configuration = new Configuration.Builder()
                 .setName(Properties.getValue("bot.nick"))
@@ -67,9 +76,20 @@ public class TitanBot {
      * Registers all the modules of the application.
      */
     private void registerModules() {
-        this.modules.add(new AnnoyingModule());
-        this.modules.add(new TestCommandModule());
+        MODULES.add(new AnnoyingModule());
+        MODULES.add(new TestCommandModule());
+        MODULES.add(new LastSeenModule());
 
         LOGGER.info("Registered all modules.");
+    }
+
+    /**
+     * Create all the sqlite tables we need
+     */
+    private void createTables() {
+        try {
+            Statement stmt = databaseConnection.createStatement();
+            stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), login VARCHAR(50), seen INTEGER)");
+        } catch(Exception e) {}
     }
 }
