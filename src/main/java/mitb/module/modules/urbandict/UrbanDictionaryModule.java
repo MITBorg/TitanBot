@@ -9,6 +9,7 @@ import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.module.modules.urbandict.json.*;
+import mitb.util.Properties;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -32,7 +33,7 @@ public class UrbanDictionaryModule extends CommandModule {
     /**
      * Our API key.
      */
-    private static final String API_KEY = "rBWb4Cg1Gdmsh3ykEYXwSbSeq9ZZp18MvbUjsn1leuWzeRVaxE";
+    private static final String API_KEY = Properties.getValue("urbandict.api_key");
 
     @Override
     public String[] getCommands() {
