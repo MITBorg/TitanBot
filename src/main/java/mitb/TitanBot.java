@@ -140,6 +140,7 @@ public class TitanBot {
         MODULES.add(new SedReplacementModule());
         MODULES.add(new WeatherModule());
         MODULES.add(new MemoModule());
+        MODULES.add(new FlameBotModule());
 
         LOGGER.info("Registered all modules.");
     }

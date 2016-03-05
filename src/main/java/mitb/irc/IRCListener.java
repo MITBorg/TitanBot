@@ -3,6 +3,7 @@ package mitb.irc;
 import mitb.TitanBot;
 import mitb.event.EventHandler;
 import mitb.event.events.CommandEvent;
+import mitb.event.events.JoinEvent;
 import mitb.event.events.MessageEvent;
 import mitb.event.events.PrivateMessageEvent;
 import org.pircbotx.hooks.ListenerAdapter;
@@ -56,10 +57,6 @@ public class IRCListener extends ListenerAdapter {
 
     @Override
     public void onJoin(org.pircbotx.hooks.events.JoinEvent event) {
-        // Easter egg
-        // XXX move to a module
-        if(!event.getUser().getNick().equals(event.getBot().getNick()) && event.getUser().getNick().toLowerCase().endsWith("bot")) {
-            event.respond("im better than u scrublord");
-        }
+        EventHandler.trigger(new JoinEvent(event));
     }
 }

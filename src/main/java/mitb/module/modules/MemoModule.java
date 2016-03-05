@@ -3,6 +3,7 @@ package mitb.module.modules;
 import com.google.common.base.Joiner;
 import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
+import mitb.event.events.JoinEvent;
 import mitb.module.CommandModule;
 import org.pircbotx.hooks.events.MessageEvent;
 
@@ -60,6 +61,10 @@ public class MemoModule extends CommandModule {
                 TitanBot.sendReply(event.getOriginalEvent(), "There is no message for you from: " + senderNick);
             }
         }
+    }
+
+    public void onJoin(JoinEvent event) {
+        System.out.println("test");
     }
 
     @Override
