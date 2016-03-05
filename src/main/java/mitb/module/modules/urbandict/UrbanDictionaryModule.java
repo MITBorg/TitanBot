@@ -36,7 +36,7 @@ public class UrbanDictionaryModule extends CommandModule {
 
     @Override
     public String[] getCommands() {
-        return new String[]{"urban", "urbandictionary", "ub", "ud"};
+        return new String[]{"urbandictionary", "urban", "ub", "ud"};
     }
 
     @Override

@@ -61,6 +61,7 @@ public class WeatherModule extends CommandModule {
      */
     @Override
     public void onCommand(CommandEvent event) {
+        // TODO cache results to speed up repeat queries
         boolean useCachedLocation = false;
         String nick = ((MessageEvent)event.getOriginalEvent()).getUser().getNick();
 
