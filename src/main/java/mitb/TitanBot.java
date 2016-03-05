@@ -6,6 +6,7 @@ import mitb.event.EventHandler;
 import mitb.irc.IRCListener;
 import mitb.module.Module;
 import mitb.module.modules.*;
+import mitb.module.modules.weather.WeatherModule;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
@@ -66,7 +67,7 @@ public class TitanBot {
      * @param reply message we should send.
      */
     public static void sendReply(GenericEvent event, String reply) {
-        if (RATE_LIMITER.tryAcquire()) {
+        if(RATE_LIMITER.tryAcquire()) {
             event.respond(reply);
         }
     }
@@ -79,8 +80,7 @@ public class TitanBot {
         MODULES.add(new LastSeenModule());
         MODULES.add(new StatsModule());
         MODULES.add(new UrbanDictionaryModule());
-        MODULES.add(new HelpModule());
-        MODULES.add(new SedReplacementModule());
+        MODULES.add(new WeatherModule());
 
         LOGGER.info("Registered all modules.");
     }
@@ -92,6 +92,7 @@ public class TitanBot {
         try {
             Statement stmt = databaseConnection.createStatement();
             stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), login VARCHAR(50), seen DATETIME)");
+            stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), location VARCHAR(50))");
         } catch(Exception e) {}
     }
 }
