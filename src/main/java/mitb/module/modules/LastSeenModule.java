@@ -25,6 +25,9 @@ public class LastSeenModule extends CommandModule {
         return new String[]{"seen", "lastseen"};
     }
 
+    /**
+     * Check when the specified person last spoke and return with a response.
+     */
     @Override
     public void onCommand(CommandEvent commandEvent) {
         if(commandEvent.getArgs().length == 0) {
@@ -52,6 +55,11 @@ public class LastSeenModule extends CommandModule {
         EventHandler.register(this);
     }
 
+    /**
+     * Update the last time a user has spoken every time they say something.
+     *
+     * @param event message event when they have said something
+     */
     @Listener
     public void onChatter(MessageEvent event) {
         try {

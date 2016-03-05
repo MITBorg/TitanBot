@@ -9,6 +9,11 @@ public class TestCommandModule extends CommandModule {
         return new String[]{"testcmd", "testo"};
     }
 
+    /**
+     * Reply with an example response on command.
+     *
+     * @param commandEvent
+     */
     @Override
     public void onCommand(CommandEvent commandEvent) {
         commandEvent.getOriginalEvent().respond("response from test command");

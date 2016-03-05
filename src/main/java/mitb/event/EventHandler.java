@@ -7,6 +7,11 @@ import java.util.Map;
 public class EventHandler {
     private static Map<Object, Map<Method, Class<? extends Event>>> eventListeners = new HashMap<>();
 
+    /**
+     * Register some event handlers with the event bus.
+     *
+     * @param o object to register the events of
+     */
     public static void register(Object o) {
         if(eventListeners.containsKey(o)) {
             return;
@@ -23,6 +28,11 @@ public class EventHandler {
         eventListeners.put(o, list);
     }
 
+    /**
+     * Loop over all of our event listeners and see if our `event` can trigger each event listener. If it can, do it.
+     *
+     * @param event event to send out to listeners
+     */
     public static void trigger(Event event) {
         eventListeners.entrySet().stream().forEach(entry -> {
             Map<Method, Class<? extends Event>> events = entry.getValue();
