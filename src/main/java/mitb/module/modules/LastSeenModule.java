@@ -12,13 +12,8 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Checks when a user was last seen speaking
@@ -53,7 +48,6 @@ public class LastSeenModule extends CommandModule {
 
             TitanBot.sendReply(commandEvent.getOriginalEvent(), "I last saw " + nick + " " + pretty + ".");
         } catch(Exception e) {
-            e.printStackTrace();
             TitanBot.sendReply(commandEvent.getOriginalEvent(), "I have never seen " + nick + ".");
         }
     }

@@ -6,6 +6,7 @@ import mitb.event.EventHandler;
 import mitb.irc.IRCListener;
 import mitb.module.Module;
 import mitb.module.modules.LastSeenModule;
+import mitb.module.modules.StatsModule;
 import mitb.module.modules.TestCommandModule;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
@@ -77,6 +78,7 @@ public class TitanBot {
     private void registerModules() {
         MODULES.add(new TestCommandModule());
         MODULES.add(new LastSeenModule());
+        MODULES.add(new StatsModule());
 
         LOGGER.info("Registered all modules.");
     }
