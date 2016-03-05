@@ -1,5 +1,6 @@
 package mitb.module.modules;
 
+import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 
@@ -7,6 +8,11 @@ public class TestCommandModule extends CommandModule {
     @Override
     public String[] getCommands() {
         return new String[]{"testcmd", "testo"};
+    }
+
+    @Override
+    public void getHelp(CommandEvent event) {
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: testo");
     }
 
     /**

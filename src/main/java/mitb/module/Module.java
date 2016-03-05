@@ -11,5 +11,5 @@ public abstract class Module {
     /**
      * Called upon module register. Used for registering event listeners, etc.
      */
-    public abstract void register();
+    protected abstract void register();
 }

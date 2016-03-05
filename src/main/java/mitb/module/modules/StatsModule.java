@@ -23,9 +23,13 @@ public class StatsModule extends CommandModule {
     }
 
     @Override
+    public void getHelp(CommandEvent event) {
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0]);
+    }
+
+    @Override
     public void onCommand(CommandEvent commandEvent) {
         long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
-        System.out.println(uptime);
         double load = ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
         String started = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)
                 .withLocale(Locale.UK)

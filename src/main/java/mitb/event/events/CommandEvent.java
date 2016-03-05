@@ -36,7 +36,7 @@ public class CommandEvent implements Event, ProxyEvent {
     public String[] getArgs() {
         String[] args = msg.split(" ");
 
-        if(args.length < 2) {
+        if (args.length < 2) {
             return new String[]{};
         }
 

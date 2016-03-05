@@ -18,10 +18,10 @@ public class CommandHandler {
      * Register some commands with command registry.
      */
     public static void register(CommandListener listener, String[] commands) {
-        for(String command : commands) {
+        for (String command : commands) {
             command = command.toLowerCase();
 
-            if(!listeners.containsKey(command)) {
+            if (!listeners.containsKey(command)) {
                 listeners.put(command, new ArrayList<>());
             }
 
@@ -34,11 +34,11 @@ public class CommandHandler {
      */
     @Listener
     public static void trigger(CommandEvent e) {
-        if(!listeners.containsKey(e.getCommand().toLowerCase())) {
+        if (!listeners.containsKey(e.getCommand().toLowerCase())) {
             return;
         }
 
-        for(CommandListener commandListener : listeners.get(e.getCommand().toLowerCase())) {
+        for (CommandListener commandListener : listeners.get(e.getCommand().toLowerCase())) {
             commandListener.onCommand(e);
         }
     }

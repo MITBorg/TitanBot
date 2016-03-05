@@ -13,14 +13,14 @@ public class EventHandler {
      * @param o object to register the events of
      */
     public static void register(Object o) {
-        if(eventListeners.containsKey(o)) {
+        if (eventListeners.containsKey(o)) {
             return;
         }
 
         HashMap<Method, Class<? extends Event>> list = new HashMap<>();
 
-        for(Method method : o.getClass().getMethods()) {
-            if(method.isAnnotationPresent(Listener.class)) {
+        for (Method method : o.getClass().getMethods()) {
+            if (method.isAnnotationPresent(Listener.class)) {
                 list.put(method, (Class<? extends Event>) method.getParameterTypes()[0]);
             }
         }

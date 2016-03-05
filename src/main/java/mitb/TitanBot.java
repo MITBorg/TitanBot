@@ -5,10 +5,7 @@ import mitb.command.CommandHandler;
 import mitb.event.EventHandler;
 import mitb.irc.IRCListener;
 import mitb.module.Module;
-import mitb.module.modules.LastSeenModule;
-import mitb.module.modules.StatsModule;
-import mitb.module.modules.TestCommandModule;
-import mitb.module.modules.UrbanDictionaryModule;
+import mitb.module.modules.*;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
@@ -69,7 +66,7 @@ public class TitanBot {
      * @param reply message we should send.
      */
     public static void sendReply(GenericEvent event, String reply) {
-        if(RATE_LIMITER.tryAcquire()) {
+        if (RATE_LIMITER.tryAcquire()) {
             event.respond(reply);
         }
     }
@@ -82,6 +79,8 @@ public class TitanBot {
         MODULES.add(new LastSeenModule());
         MODULES.add(new StatsModule());
         MODULES.add(new UrbanDictionaryModule());
+        MODULES.add(new HelpModule());
+        MODULES.add(new SedReplacementModule());
 
         LOGGER.info("Registered all modules.");
     }

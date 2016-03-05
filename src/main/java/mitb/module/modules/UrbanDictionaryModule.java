@@ -19,15 +19,16 @@ import java.util.Arrays;
  * Queries urban dictionary through a third-party API.
  */
 public class UrbanDictionaryModule extends CommandModule {
-
     /**
      * Bold encapsulation string.
      */
     private static final String BOLD = "\u0002";
+
     /**
      * The API URL.
      */
     private static final String API_URL = "https://mashape-community-urban-dictionary.p.mashape.com/define?term=";
+
     /**
      * Our API key.
      */
@@ -36,6 +37,11 @@ public class UrbanDictionaryModule extends CommandModule {
     @Override
     public String[] getCommands() {
         return new String[]{"urban", "urbandictionary", "ub"};
+    }
+
+    @Override
+    public void getHelp(CommandEvent event) {
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " [result #] term");
     }
 
     /**
