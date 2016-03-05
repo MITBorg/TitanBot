@@ -2,7 +2,6 @@ package mitb.event.events;
 
 import mitb.event.Event;
 import mitb.event.ProxyEvent;
-import org.pircbotx.hooks.types.GenericEvent;
 
 /**
  * Fired whenever a message is sent in a channel.

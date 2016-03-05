@@ -7,7 +7,6 @@ import mitb.event.events.MessageEvent;
 import mitb.event.events.PrivateMessageEvent;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.InviteEvent;
-import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.output.OutputIRC;
 
 import java.util.regex.Matcher;
@@ -56,7 +55,9 @@ public class IRCListener extends ListenerAdapter {
     }
 
     @Override
-    public void onJoin(JoinEvent event) {
+    public void onJoin(org.pircbotx.hooks.events.JoinEvent event) {
+        // Easter egg
+        // XXX move to a module
         if(!event.getUser().getNick().equals(event.getBot().getNick()) && event.getUser().getNick().toLowerCase().endsWith("bot")) {
             event.respond("im better than u scrublord");
         }

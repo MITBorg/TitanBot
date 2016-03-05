@@ -1,6 +1,5 @@
 package mitb.module.modules;
 
-import mitb.TitanBot;
 import mitb.event.EventHandler;
 import mitb.event.Listener;
 import mitb.event.events.MessageEvent;

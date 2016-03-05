@@ -139,6 +139,7 @@ public class TitanBot {
         MODULES.add(new HelpModule());
         MODULES.add(new SedReplacementModule());
         MODULES.add(new WeatherModule());
+        MODULES.add(new MemoModule());
 
         LOGGER.info("Registered all modules.");
     }
@@ -151,6 +152,7 @@ public class TitanBot {
             Statement stmt = databaseConnection.createStatement();
             stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), login VARCHAR(50), seen DATETIME)");
             stmt.execute("CREATE TABLE weather (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), location VARCHAR(50))");
+            stmt.execute("CREATE TABLE memo (id INTEGER PRIMARY KEY AUTOINCREMENT, target_nick VARCHAR(50), sender_nick VARCHAR(50), message VARCHAR(350))");
         } catch(Exception ignored) {}
     }
 }

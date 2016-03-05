@@ -63,7 +63,7 @@ public class WeatherModule extends CommandModule {
     public void onCommand(CommandEvent event) {
         // TODO cache results to speed up repeat queries
         boolean useCachedLocation = false;
-        String nick = ((MessageEvent)event.getOriginalEvent()).getUser().getNick();
+        String callerNick = ((MessageEvent)event.getOriginalEvent()).getUser().getNick();
 
         // Checking if we should use a cached location for the user
         if (event.getArgs().length == 0) {
@@ -71,7 +71,7 @@ public class WeatherModule extends CommandModule {
         }
 
         // Construct query and url
-        String location = useCachedLocation ? getCachedLocation(nick) : Joiner.on(" ").join(event.getArgs());
+        String location = useCachedLocation ? getCachedLocation(callerNick) : Joiner.on(" ").join(event.getArgs());
         String sanitizedLocation;
 
         // Ensure cached location was found
@@ -110,7 +110,7 @@ public class WeatherModule extends CommandModule {
 
                             // Update database if necessary
                             if (!finalUseCachedLocation) {
-                                updateCachedLocation(nick, location);
+                                updateCachedLocation(callerNick, location);
                             }
                         }
                         return response;
