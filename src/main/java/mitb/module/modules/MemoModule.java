@@ -3,13 +3,16 @@ package mitb.module.modules;
 import com.google.common.base.Joiner;
 import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
+import mitb.event.events.JoinEvent;
 import mitb.module.CommandModule;
 import org.pircbotx.hooks.events.MessageEvent;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A way of sending memos to users when they next login.
@@ -60,6 +63,10 @@ public class MemoModule extends CommandModule {
                 TitanBot.sendReply(event.getOriginalEvent(), "There is no message for you from: " + senderNick);
             }
         }
+    }
+
+    public void onJoin(JoinEvent event) {
+        System.out.println("test");
     }
 
     @Override
@@ -128,19 +135,21 @@ public class MemoModule extends CommandModule {
     }
 
     /**
-     * If the user with the given nickname has any messages in the system.
+     * A list of users who have messages for this user.
      * @param targetNick
      */
-    public boolean hasMessages(String targetNick) {
+    public List getMessageSenders(String targetNick) {
         try {
+            List l = new ArrayList();
+
             PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
-                    "SELECT message FROM memo WHERE target_nick = ?"
+                    "SELECT sender_nick FROM memo WHERE target_nick = ?"
             );
             statement.setString(1, targetNick);
             ResultSet resultSet = statement.executeQuery();
-            return resultSet.getFetchSize() > 0;
+            return l;
         } catch (SQLException e) {
-            return false;
+            return null;
         }
     }
 }
