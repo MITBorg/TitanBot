@@ -8,6 +8,7 @@ import mitb.module.Module;
 import mitb.module.modules.LastSeenModule;
 import mitb.module.modules.StatsModule;
 import mitb.module.modules.TestCommandModule;
+import mitb.module.modules.UrbanDictionaryModule;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
@@ -50,6 +51,7 @@ public class TitanBot {
                 .setSocketFactory(new UtilSSLSocketFactory().trustAllCertificates())
                 .setAutoNickChange(true)
                 .setAutoReconnect(true)
+                .setAutoSplitMessage(true)
                 //.addAutoJoinChannel("#mopar")
                 .addListener(new IRCListener())
                 .addCapHandler(new TLSCapHandler((SSLSocketFactory) SSLSocketFactory.getDefault(), true))
@@ -79,6 +81,7 @@ public class TitanBot {
         MODULES.add(new TestCommandModule());
         MODULES.add(new LastSeenModule());
         MODULES.add(new StatsModule());
+        MODULES.add(new UrbanDictionaryModule());
 
         LOGGER.info("Registered all modules.");
     }
