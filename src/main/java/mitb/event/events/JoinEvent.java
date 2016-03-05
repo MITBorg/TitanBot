@@ -7,7 +7,7 @@ import mitb.event.ProxyEvent;
  * A channel join event.
  */
 public class JoinEvent implements Event, ProxyEvent {
-    protected org.pircbotx.hooks.events.JoinEvent event = null;
+    private org.pircbotx.hooks.events.JoinEvent event = null;
 
     public JoinEvent(org.pircbotx.hooks.events.JoinEvent originalEvent) {
         this.event = originalEvent;

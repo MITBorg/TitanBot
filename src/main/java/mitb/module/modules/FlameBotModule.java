@@ -8,7 +8,7 @@ import mitb.module.Module;
 /**
  * Flames other bots when they join a channel this bot is on.
  */
-public class FlameBotModule extends Module {
+public final class FlameBotModule extends Module {
 
     @Listener
     public void onJoin(JoinEvent event) {

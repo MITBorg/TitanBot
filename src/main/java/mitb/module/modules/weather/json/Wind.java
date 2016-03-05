@@ -1,6 +1,6 @@
 package mitb.module.modules.weather.json;
 
-public class Wind {
+public final class Wind {
 
     private String chill;
     private String direction;

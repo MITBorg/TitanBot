@@ -1,6 +1,6 @@
 package mitb.module.modules.weather.json;
 
-public class Results {
+public final class Results {
 
     private Channel channel;
 

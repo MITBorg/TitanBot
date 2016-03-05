@@ -3,7 +3,7 @@ package mitb.module.modules.weather.json;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Item {
+public final class Item {
 
     private String title;
     private String lat;
@@ -12,7 +12,7 @@ public class Item {
     private String pubDate;
     private Condition condition;
     private String description;
-    private final List<Forecast> forecast = new ArrayList<Forecast>();
+    private final List<Forecast> forecast = new ArrayList<>();
     private Guid guid;
 
     public String getTitle() {

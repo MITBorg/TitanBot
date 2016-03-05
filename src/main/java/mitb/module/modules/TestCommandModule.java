@@ -4,7 +4,7 @@ import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 
-public class TestCommandModule extends CommandModule {
+public final class TestCommandModule extends CommandModule {
     @Override
     public String[] getCommands() {
         return new String[]{"testcmd", "testo"};

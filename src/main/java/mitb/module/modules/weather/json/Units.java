@@ -1,6 +1,6 @@
 package mitb.module.modules.weather.json;
 
-public class Units {
+public final class Units {
 
     private String distance;
     private String pressure;

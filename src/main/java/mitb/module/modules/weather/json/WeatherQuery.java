@@ -1,6 +1,6 @@
 package mitb.module.modules.weather.json;
 
-public class WeatherQuery {
+public final class WeatherQuery {
 
     private Query query;
 

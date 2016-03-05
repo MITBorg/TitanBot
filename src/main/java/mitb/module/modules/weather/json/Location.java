@@ -1,6 +1,6 @@
 package mitb.module.modules.weather.json;
 
-public class Location {
+public final class Location {
 
     private String city;
     private String country;

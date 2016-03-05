@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * A weather lookup module through the Yahoo Weather API.
  */
-public class WeatherModule extends CommandModule {
+public final class WeatherModule extends CommandModule {
 
     /**
      * Bold encapsulation string.
@@ -151,7 +151,7 @@ public class WeatherModule extends CommandModule {
      * Gets a user's cached location from the database.
      * @return Cached location or null if not found.
      */
-    public String getCachedLocation(String nick) {
+    private String getCachedLocation(String nick) {
         try {
             PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
                     "SELECT location FROM weather WHERE nick = ?"

@@ -4,7 +4,7 @@ package mitb.module;
  * Abstract class which all modules should extend.
  */
 public abstract class Module {
-    public Module() {
+    protected Module() {
         this.register();
     }
 

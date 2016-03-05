@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * A way of sending memos to users when they next login.
  */
-public class MemoModule extends CommandModule {
+public final class MemoModule extends CommandModule {
 
     @Override
     public String[] getCommands() {
@@ -169,7 +169,7 @@ public class MemoModule extends CommandModule {
      * @param targetNick
      * @return
      */
-    public String getMessage(String senderNick, String targetNick) {
+    private String getMessage(String senderNick, String targetNick) {
         try {
             PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
                     "SELECT message FROM memo WHERE sender_nick = ? AND target_nick = ?"
@@ -187,7 +187,7 @@ public class MemoModule extends CommandModule {
      * A list of users who have messages for this user.
      * @param targetNick
      */
-    public List<String> getMessageSenders(String targetNick) {
+    private List<String> getMessageSenders(String targetNick) {
         try {
             List<String> l = new ArrayList();
 

@@ -1,6 +1,6 @@
 package mitb.module.modules.weather.json;
 
-public class Astronomy {
+public final class Astronomy {
 
     private String sunrise;
     private String sunset;

@@ -15,7 +15,7 @@ import java.util.Locale;
 /**
  * Display some information about the bot and the server the bot is running on.
  */
-public class StatsModule extends CommandModule {
+public final class StatsModule extends CommandModule {
 
     @Override
     public String[] getCommands() {

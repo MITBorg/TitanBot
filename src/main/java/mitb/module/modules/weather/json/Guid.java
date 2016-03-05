@@ -1,6 +1,6 @@
 package mitb.module.modules.weather.json;
 
-public class Guid {
+public final class Guid {
 
     private String isPermaLink;
     private String content;

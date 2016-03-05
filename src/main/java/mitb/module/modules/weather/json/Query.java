@@ -1,6 +1,6 @@
 package mitb.module.modules.weather.json;
 
-public class Query {
+public final class Query {
 
     private long count;
     private String created;

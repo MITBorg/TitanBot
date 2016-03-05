@@ -18,7 +18,7 @@ import java.util.Arrays;
 /**
  * Queries urban dictionary through a third-party API.
  */
-public class UrbanDictionaryModule extends CommandModule {
+public final class UrbanDictionaryModule extends CommandModule {
 
     /**
      * Bold encapsulation string.
@@ -133,7 +133,7 @@ public class UrbanDictionaryModule extends CommandModule {
      * @param entryNo
      * @return
      */
-    public String formatUrbanDictionaryQuery(UrbanDictionaryQuery q, int entryNo) {
+    private String formatUrbanDictionaryQuery(UrbanDictionaryQuery q, int entryNo) {
         List l = q.getList().get(entryNo);
         return String.format("%s: %s [by %s +%d/-%d]",
                 wrapBold(l.getWord()), l.getDefinition().replaceAll("\r", "").replaceAll("\n", " "),

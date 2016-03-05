@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * Provides the "help" command to show syntax of a command.
  */
-public class HelpModule extends CommandModule {
+public final class HelpModule extends CommandModule {
     @Override
     public String[] getCommands() {
         return new String[]{"help"};

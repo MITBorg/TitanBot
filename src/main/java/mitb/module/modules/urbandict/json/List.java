@@ -1,16 +1,16 @@
 package mitb.module.modules.urbandict.json;
 
-public class List {
+public final class List {
 
-    public String definition;
-    public String permalink;
-    public long thumbsUp;
-    public String author;
-    public String word;
-    public long defid;
-    public String currentVote;
-    public String example;
-    public long thumbsDown;
+    private String definition;
+    private String permalink;
+    private long thumbsUp;
+    private String author;
+    private String word;
+    private long defid;
+    private String currentVote;
+    private String example;
+    private long thumbsDown;
 
     public String getDefinition() {
         return definition;

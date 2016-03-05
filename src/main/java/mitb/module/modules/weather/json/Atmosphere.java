@@ -1,10 +1,6 @@
-
 package mitb.module.modules.weather.json;
 
-import javax.annotation.Generated;
-
-@Generated("org.jsonschema2pojo")
-public class Atmosphere {
+public final class Atmosphere {
 
     private String humidity;
     private String pressure;

@@ -18,7 +18,7 @@ import java.util.Date;
 /**
  * Checks when a user was last seen speaking
  */
-public class LastSeenModule extends CommandModule {
+public final class LastSeenModule extends CommandModule {
 
     @Override
     public String[] getCommands() {

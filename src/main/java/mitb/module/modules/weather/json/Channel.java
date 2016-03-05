@@ -1,10 +1,6 @@
-
 package mitb.module.modules.weather.json;
 
-import javax.annotation.Generated;
-
-@Generated("org.jsonschema2pojo")
-public class Channel {
+public final class Channel {
 
     private String title;
     private String link;

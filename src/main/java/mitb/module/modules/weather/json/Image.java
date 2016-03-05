@@ -1,6 +1,6 @@
 package mitb.module.modules.weather.json;
 
-public class Image {
+public final class Image {
 
     private String title;
     private String width;

@@ -1,6 +1,6 @@
 package mitb.module.modules.weather.json;
 
-public class Condition {
+public final class Condition {
 
     private String code;
     private String date;

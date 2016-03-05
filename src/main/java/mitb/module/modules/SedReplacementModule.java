@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 /**
  * Allows people to use s/abc/def/ replacement.
  */
-public class SedReplacementModule extends Module {
+public final class SedReplacementModule extends Module {
     private final Map<String, String> cache = new HashMap<>();
 
     @Listener
