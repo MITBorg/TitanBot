@@ -1,4 +1,4 @@
-package mitb;
+package mitb.util;
 
 import java.util.ResourceBundle;
 

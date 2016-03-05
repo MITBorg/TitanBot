@@ -9,9 +9,14 @@ import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.module.modules.weather.json.*;
+import mitb.util.MathHelper;
+import org.pircbotx.hooks.events.MessageEvent;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -56,10 +61,23 @@ public class WeatherModule extends CommandModule {
      */
     @Override
     public void onCommand(CommandEvent event) {
-        // TODO record users location for future use (into db)
+        boolean useCachedLocation = false;
+        String nick = ((MessageEvent)event.getOriginalEvent()).getUser().getNick();
+
+        // Checking if we should use a cached location for the user
+        if (event.getArgs().length == 0) {
+            useCachedLocation = true;
+        }
+
         // Construct query and url
-        String location = Joiner.on(" ").join(event.getArgs());
+        String location = useCachedLocation ? getCachedLocation(nick) : Joiner.on(" ").join(event.getArgs());
         String sanitizedLocation;
+
+        // Ensure cached location was found
+        if (location == null) {
+            TitanBot.sendReply(event.getOriginalEvent(), "There is no cached location for your nickname.");
+            return;
+        }
 
         try {
             sanitizedLocation = URLEncoder.encode(location, "UTF-8");
@@ -70,6 +88,8 @@ public class WeatherModule extends CommandModule {
         String url = API_URL_PART_1 + sanitizedLocation + API_URL_PART_2; // XXX clean up this garbage
 
         // Api call
+        final boolean finalUseCachedLocation = useCachedLocation;
+
         AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
         asyncHttpClient.prepareGet(url)
                 .addHeader("Accept", "text/plain")
@@ -86,6 +106,11 @@ public class WeatherModule extends CommandModule {
                             TitanBot.sendReply(event.getOriginalEvent(), "There is no data for location: " + location);
                         } else {
                             TitanBot.sendReply(event.getOriginalEvent(), formatWeatherQuery(resp.getQuery()));
+
+                            // Update database if necessary
+                            if (!finalUseCachedLocation) {
+                                updateCachedLocation(nick, location);
+                            }
                         }
                         return response;
                     }
@@ -100,6 +125,42 @@ public class WeatherModule extends CommandModule {
     @Override
     public void register() {
 
+    }
+
+    /**
+     * Updates the cached location for the given nickname.
+     * @param nick
+     * @param location
+     */
+    private void updateCachedLocation(String nick, String location) {
+        try {
+            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+                    "INSERT OR REPLACE INTO weather (id, nick, location) VALUES ((SELECT id FROM weather WHERE nick = ?), ?, ?)"
+            );
+            statement.setString(1, nick);
+            statement.setString(2, nick);
+            statement.setString(3, location);
+            statement.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Gets a user's cached location from the database.
+     * @return Cached location or null if not found.
+     */
+    public String getCachedLocation(String nick) {
+        try {
+            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+                    "SELECT location FROM weather WHERE nick = ?"
+            );
+            statement.setString(1, nick);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.getString("location");
+        } catch (SQLException e) {
+            return null;
+        }
     }
 
     /**
@@ -148,8 +209,8 @@ public class WeatherModule extends CommandModule {
             // Calculate temperatures
             String highF = forecast.getHigh() + FAHRENHEIT_SYMBOL;
             String lowF = forecast.getLow() + FAHRENHEIT_SYMBOL;
-            String highC = fahrenheitToCelsius(Integer.parseInt(forecast.getHigh())) + CELSIUS_SYMBOL;
-            String lowC = fahrenheitToCelsius(Integer.parseInt(forecast.getLow())) + CELSIUS_SYMBOL;
+            String highC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getHigh())) + CELSIUS_SYMBOL;
+            String lowC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getLow())) + CELSIUS_SYMBOL;
 
             // Append data
             sb.append(forecast.getDay()).append(": ")
@@ -163,15 +224,6 @@ public class WeatherModule extends CommandModule {
             }
         }
         return sb.append(".").toString();
-    }
-
-    /**
-     * Converts a temperature in fahrenheit to celsius.
-     * @param f
-     * @return
-     */
-    private static int fahrenheitToCelsius(int f) {
-        return (((f-32)*5)/9);
     }
 
     /**

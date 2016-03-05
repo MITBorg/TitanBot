@@ -8,6 +8,7 @@ import mitb.module.Module;
 import mitb.module.modules.*;
 import mitb.module.modules.urbandict.UrbanDictionaryModule;
 import mitb.module.modules.weather.WeatherModule;
+import mitb.util.Properties;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
@@ -52,6 +53,7 @@ public class TitanBot {
                 .setAutoNickChange(true)
                 .setAutoReconnect(true)
                 .setAutoSplitMessage(true)
+                .setMaxLineLength(512)
                 //.addAutoJoinChannel("#mopar")
                 .addListener(new IRCListener())
                 .addCapHandler(new TLSCapHandler((SSLSocketFactory) SSLSocketFactory.getDefault(), true))
@@ -96,7 +98,7 @@ public class TitanBot {
         try {
             Statement stmt = databaseConnection.createStatement();
             stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), login VARCHAR(50), seen DATETIME)");
-            stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), location VARCHAR(50))");
-        } catch(Exception e) {}
+            stmt.execute("CREATE TABLE weather (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), location VARCHAR(50))");
+        } catch(Exception ignored) {}
     }
 }

@@ -1,7 +1,8 @@
 package mitb;
 
-public class App
-{
+import mitb.util.Properties;
+
+public class App {
     /**
      * Main entry point to the application.
      *
