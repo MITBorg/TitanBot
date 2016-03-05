@@ -54,7 +54,7 @@ public class TitanBot {
                 .setAutoNickChange(true)
                 .setAutoReconnect(true)
                 .setAutoSplitMessage(false)
-                //.addAutoJoinChannel("#mopar")
+                .addAutoJoinChannel("#mopar")
                 .addListener(new IRCListener())
                 .addCapHandler(new TLSCapHandler((SSLSocketFactory) SSLSocketFactory.getDefault(), true))
                 .addServer(Properties.getValue("irc.server"), 6697)
