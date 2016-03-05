@@ -34,8 +34,8 @@ public class IRCListener extends ListenerAdapter {
     public void onMessage(org.pircbotx.hooks.events.MessageEvent event) {
         EventHandler.trigger(new MessageEvent(event));
 
-        if(event.getMessage().startsWith(Properties.getValue("bot.nick"))) {
-            Pattern pattern = Pattern.compile(Properties.getValue("bot.nick") + ".? (.*)");
+        if(event.getMessage().startsWith(event.getBot().getNick())) {
+            Pattern pattern = Pattern.compile(event.getBot().getNick() + ".? (.*)");
             Matcher matcher = pattern.matcher(event.getMessage());
 
             if(matcher.find()) {

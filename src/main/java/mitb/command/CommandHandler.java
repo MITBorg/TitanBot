@@ -37,7 +37,7 @@ public class CommandHandler {
         if(!listeners.containsKey(e.getCommand().toLowerCase())) {
             return;
         }
-        
+
         for(CommandListener commandListener : listeners.get(e.getCommand().toLowerCase())) {
             commandListener.onCommand(e);
         }
