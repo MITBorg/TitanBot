@@ -5,7 +5,6 @@ import mitb.command.CommandHandler;
 import mitb.event.EventHandler;
 import mitb.irc.IRCListener;
 import mitb.module.Module;
-import mitb.module.modules.AnnoyingModule;
 import mitb.module.modules.LastSeenModule;
 import mitb.module.modules.TestCommandModule;
 import org.pircbotx.Configuration;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLSocketFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +47,9 @@ public class TitanBot {
                 .setVersion(Properties.getValue("bot.version"))
                 .setRealName(Properties.getValue("bot.real_name"))
                 .setSocketFactory(new UtilSSLSocketFactory().trustAllCertificates())
-                .setAutoReconnect(true)
                 .setAutoNickChange(true)
+                .setAutoReconnect(true)
+                //.addAutoJoinChannel("#mopar")
                 .addListener(new IRCListener())
                 .addCapHandler(new TLSCapHandler((SSLSocketFactory) SSLSocketFactory.getDefault(), true))
                 .addServer(Properties.getValue("irc.server"), 6697)
@@ -76,7 +75,6 @@ public class TitanBot {
      * Registers all the modules of the application.
      */
     private void registerModules() {
-        MODULES.add(new AnnoyingModule());
         MODULES.add(new TestCommandModule());
         MODULES.add(new LastSeenModule());
 
@@ -89,7 +87,7 @@ public class TitanBot {
     private void createTables() {
         try {
             Statement stmt = databaseConnection.createStatement();
-            stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), login VARCHAR(50), seen INTEGER)");
+            stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), login VARCHAR(50), seen DATETIME)");
         } catch(Exception e) {}
     }
 }

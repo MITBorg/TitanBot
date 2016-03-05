@@ -13,7 +13,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Checks when a user was last seen speaking
@@ -43,9 +48,12 @@ public class LastSeenModule extends CommandModule {
             statement.setString(1, nick);
             ResultSet resultSet = statement.executeQuery();
             PrettyTime prettyTime = new PrettyTime();
+            Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(resultSet.getString("seen"));
+            String pretty = prettyTime.format(date);
 
-            TitanBot.sendReply(commandEvent.getOriginalEvent(), "I last saw " + nick + " " + prettyTime.format(resultSet.getTime("seen")) + ".");
+            TitanBot.sendReply(commandEvent.getOriginalEvent(), "I last saw " + nick + " " + pretty + ".");
         } catch(Exception e) {
+            e.printStackTrace();
             TitanBot.sendReply(commandEvent.getOriginalEvent(), "I have never seen " + nick + ".");
         }
     }
@@ -64,12 +72,11 @@ public class LastSeenModule extends CommandModule {
     public void onChatter(MessageEvent event) {
         try {
             PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
-                    "INSERT OR REPLACE INTO seen (id, nick, login, seen) VALUES ((SELECT id FROM seen WHERE login = ?), ?, ?, ?)"
+                    "INSERT OR REPLACE INTO seen (id, nick, login, seen) VALUES ((SELECT id FROM seen WHERE login = ?), ?, ?, datetime())"
             );
             statement.setString(1, event.getOriginalEvent().getUser().getLogin());
             statement.setString(2, event.getOriginalEvent().getUser().getNick());
             statement.setString(3, event.getOriginalEvent().getUser().getLogin());
-            statement.setTime(4, new Time(Calendar.getInstance().getTime().getTime()));
             statement.executeUpdate();
         } catch(SQLException e) {
             e.printStackTrace();
