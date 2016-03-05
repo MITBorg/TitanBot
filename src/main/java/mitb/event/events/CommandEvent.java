@@ -11,8 +11,8 @@ import java.util.Arrays;
  * This event is fired whenever a command is sent to the bot.
  */
 public class CommandEvent implements Event, ProxyEvent {
-    private String msg;
-    private GenericMessageEvent event;
+    private final String msg;
+    private final GenericMessageEvent event;
 
     public CommandEvent(String msg, GenericMessageEvent event) {
         this.msg = msg;

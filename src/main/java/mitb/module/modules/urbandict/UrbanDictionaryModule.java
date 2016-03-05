@@ -157,8 +157,8 @@ public class UrbanDictionaryModule extends CommandModule {
 
         public static final EntryValuePair DEFAULT = new EntryValuePair(0, false);
 
-        private int entryNumber;
-        private boolean customEntry;
+        private final int entryNumber;
+        private final boolean customEntry;
 
         EntryValuePair(int entryNumber, boolean customEntry) {
             this.entryNumber = entryNumber;

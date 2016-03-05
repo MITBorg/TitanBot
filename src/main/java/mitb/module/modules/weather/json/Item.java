@@ -12,7 +12,7 @@ public class Item {
     private String pubDate;
     private Condition condition;
     private String description;
-    private List<Forecast> forecast = new ArrayList<Forecast>();
+    private final List<Forecast> forecast = new ArrayList<Forecast>();
     private Guid guid;
 
     public String getTitle() {

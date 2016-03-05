@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EventHandler {
-    private static Map<Object, Map<Method, Class<? extends Event>>> eventListeners = new HashMap<>();
+    private static final Map<Object, Map<Method, Class<? extends Event>>> eventListeners = new HashMap<>();
 
     /**
      * Register some event handlers with the event bus.

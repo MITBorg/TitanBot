@@ -187,9 +187,9 @@ public class MemoModule extends CommandModule {
      * A list of users who have messages for this user.
      * @param targetNick
      */
-    public List getMessageSenders(String targetNick) {
+    public List<String> getMessageSenders(String targetNick) {
         try {
-            List l = new ArrayList();
+            List<String> l = new ArrayList();
 
             PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
                     "SELECT sender_nick FROM memo WHERE target_nick = ?"

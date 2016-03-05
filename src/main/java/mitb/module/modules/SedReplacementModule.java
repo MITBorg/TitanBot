@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * Allows people to use s/abc/def/ replacement.
  */
 public class SedReplacementModule extends Module {
-    private Map<String, String> cache = new HashMap<>();
+    private final Map<String, String> cache = new HashMap<>();
 
     @Listener
     public void onMessage(MessageEvent event) {
@@ -40,7 +40,7 @@ public class SedReplacementModule extends Module {
             } else {
                 this.cache.put(nick, msg);
             }
-        } catch(Exception e) {}
+        } catch(Exception ignored) {}
     }
 
     @Override
