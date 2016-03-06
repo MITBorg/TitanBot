@@ -28,8 +28,8 @@ public final class MemoModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " [add] [to_nick] [msg]; "
-                + event.getArgs()[0] + " [view] [from_nick]");
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " add (target_nick) (msg) | "
+                + event.getArgs()[0] + " view (sender_nick)");
     }
 
     @Override

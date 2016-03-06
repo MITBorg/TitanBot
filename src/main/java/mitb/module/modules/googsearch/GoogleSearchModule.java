@@ -37,7 +37,7 @@ public final class GoogleSearchModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: googlesearch [term #] query");
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " [term #] (query)");
     }
 
     /**

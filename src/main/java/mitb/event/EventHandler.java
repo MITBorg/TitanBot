@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EventHandler {
+public final class EventHandler {
     private static final Map<Object, Map<Method, Class<? extends Event>>> eventListeners = new HashMap<>();
 
     /**
@@ -24,7 +24,6 @@ public class EventHandler {
                 list.put(method, (Class<? extends Event>) method.getParameterTypes()[0]);
             }
         }
-
         eventListeners.put(o, list);
     }
 

@@ -18,12 +18,12 @@ import java.util.Arrays;
 public class QuotesModule extends CommandModule {
     @Override
     public String[] getCommands() {
-        return new String[]{"quotes", "quote", "q"};
+        return new String[]{"quotes", "quote"};
     }
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: quotes [add] [quote] | quotes [view] [number]");
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " add (quote) | " + event.getArgs()[0]+ " view (number)");
     }
 
     /**

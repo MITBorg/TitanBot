@@ -18,15 +18,15 @@ public final class HelpModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: help [command]");
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " (module)");
     }
 
     @Override
-    public void onCommand(CommandEvent commandEvent) {
-        if (commandEvent.getArgs().length == 0) { // List of modules
-            sendModulesList(commandEvent);
+    public void onCommand(CommandEvent event) {
+        if (event.getArgs().length == 0) { // List of modules
+            sendModulesList(event);
         } else { // Help for specific module
-            sendModuleHelp(commandEvent);
+            sendModuleHelp(event);
         }
     }
 
@@ -61,7 +61,7 @@ public final class HelpModule extends CommandModule {
         }
 
         // Send to caller
-        TitanBot.sendReply(event.getOriginalEvent(), "Modules: " + moduleList);
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: help (module) | Modules: " + moduleList);
     }
 
     @Override

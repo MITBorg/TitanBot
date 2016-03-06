@@ -39,12 +39,12 @@ public class WolframEvaluationModule extends CommandModule {
 
     @Override
     public String[] getCommands() {
-        return new String[]{"wolfram", "wolframalpha", "wra"};
+        return new String[]{"wolframalpha", "wolfram", "wra", "wr"};
     }
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: wolfram [expression]");
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " (query)");
     }
 
     /**

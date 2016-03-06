@@ -27,7 +27,7 @@ public final class LastSeenModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " nick");
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " (nick)");
     }
 
     /**

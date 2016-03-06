@@ -12,7 +12,7 @@ public final class TestCommandModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: testo");
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0]);
     }
 
     /**
