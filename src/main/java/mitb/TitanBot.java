@@ -143,12 +143,13 @@ public class TitanBot {
         MODULES.add(new MemoModule());
         MODULES.add(new FlameBotModule());
         MODULES.add(new GoogleSearchModule());
+        MODULES.add(new QuotesModule());
 
         LOGGER.info("Registered all modules.");
     }
 
     /**
-     * Create all the sqlite tables we need
+     * Create all the SQLite tables we need
      */
     private void createTables() {
         try {
@@ -156,6 +157,7 @@ public class TitanBot {
             stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), login VARCHAR(50), seen DATETIME)");
             stmt.execute("CREATE TABLE weather (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), location VARCHAR(50))");
             stmt.execute("CREATE TABLE memo (id INTEGER PRIMARY KEY AUTOINCREMENT, target_nick VARCHAR(50), sender_nick VARCHAR(50), message VARCHAR(250))");
+            stmt.execute("CREATE TABLE quotes (id INTEGER PRIMARY KEY AUTOINCREMENT, creator_nick VARCHAR(50), quote VARCHAR(350))");
         } catch(Exception ignored) {}
     }
 }

@@ -56,7 +56,7 @@ public final class MemoModule extends CommandModule {
 
         // Attempting to view message
         if (msg != null) {
-            event.getOriginalEvent().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :[" + senderNick + "] " + msg); // XXX make this nice
+            event.getOriginalEvent().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :[" + senderNick + "] " + msg); // XXX make this pretty
             deleteMessage(senderNick, callerNick);
         } else {
             TitanBot.sendReply(event.getOriginalEvent(), "There is no message for you from: " + senderNick);

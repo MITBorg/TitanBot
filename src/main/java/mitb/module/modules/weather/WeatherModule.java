@@ -55,7 +55,7 @@ public final class WeatherModule extends CommandModule {
         }
 
         // Construct query and url
-        String location = useCachedLocation ? getCachedLocation(callerNick) : Joiner.on(" ").join(event.getArgs());
+        String location = useCachedLocation ? fetchCachedLocation(callerNick) : Joiner.on(" ").join(event.getArgs());
         String sanitizedLocation;
 
         // Ensure cached location was found
@@ -113,7 +113,7 @@ public final class WeatherModule extends CommandModule {
     }
 
     /**
-     * Updates the cached location for the given nickname.
+     * Updates the cached location for the given nickname in the dabase.
      * @param nick
      * @param location
      */
@@ -135,7 +135,7 @@ public final class WeatherModule extends CommandModule {
      * Gets a user's cached location from the database.
      * @return Cached location or null if not found.
      */
-    private String getCachedLocation(String nick) {
+    private String fetchCachedLocation(String nick) {
         try {
             PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
                     "SELECT location FROM weather WHERE nick = ?"
