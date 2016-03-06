@@ -87,10 +87,9 @@ public final class UrbanDictionaryModule extends CommandModule {
                     public Response onCompleted(Response response) throws Exception {
                         // Parsing response
                         String body = response.getResponseBody();
-
-                        // Evaluating response
                         UrbanDictionaryQuery entry = new Gson().fromJson(body, UrbanDictionaryQuery.class);
 
+                        // Evaluating response
                         if (entry.getList().size() > finalEntryNo) {
                             TitanBot.sendReply(event.getOriginalEvent(), formatUrbanDictionaryQuery(entry, finalEntryNo),
                                     "... more at " + entry.getList().get(finalEntryNo).getPermalink());
@@ -108,7 +107,12 @@ public final class UrbanDictionaryModule extends CommandModule {
                 });
     }
 
-    private EntryValuePair getEntryValues(CommandEvent event) {
+    /**
+     * Parses an {@link EntryValuePair} from the {@link CommandEvent} arguments.
+     * @param event
+     * @return
+     */
+    public static EntryValuePair getEntryValues(CommandEvent event) {
         if (event.getArgs().length > 1) {
             try {
                 return new EntryValuePair(Integer.parseInt(event.getArgs()[0]) - 1, true);
@@ -138,9 +142,9 @@ public final class UrbanDictionaryModule extends CommandModule {
 
 
     /**
-     * An UrbanDictionary entry value pair, used to represent if a custom definition number was requested.
+     * An entry value pair, used to represent if a custom definition number was requested.
      */
-    static final class EntryValuePair {
+    public static final class EntryValuePair {
 
         public static final EntryValuePair DEFAULT = new EntryValuePair(0, false);
 

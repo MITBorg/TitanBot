@@ -1,6 +1,6 @@
 # TitanBot #
 
-An IRC bot developed for the moparisthebest community using Java and Maven.
+An IRC bot developed for the moparisthebest community using Java 8 and Maven.
 
 ## Modules
 * Weather
@@ -11,6 +11,7 @@ An IRC bot developed for the moparisthebest community using Java and Maven.
 * Stats
 * TestCommand
 * FlameBot
+* Google Search
 * Help
 
 ## Contributors

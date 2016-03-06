@@ -6,6 +6,7 @@ import mitb.event.EventHandler;
 import mitb.irc.IRCListener;
 import mitb.module.Module;
 import mitb.module.modules.*;
+import mitb.module.modules.googsearch.GoogleSearchModule;
 import mitb.module.modules.urbandict.UrbanDictionaryModule;
 import mitb.module.modules.weather.WeatherModule;
 import mitb.util.Properties;
@@ -141,6 +142,7 @@ public class TitanBot {
         MODULES.add(new WeatherModule());
         MODULES.add(new MemoModule());
         MODULES.add(new FlameBotModule());
+        MODULES.add(new GoogleSearchModule());
 
         LOGGER.info("Registered all modules.");
     }
