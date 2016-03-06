@@ -10,6 +10,7 @@ import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.module.modules.urbandict.json.*;
 import mitb.util.Properties;
+import mitb.util.StringHelper;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -19,11 +20,6 @@ import java.util.Arrays;
  * Queries urban dictionary through a third-party API.
  */
 public final class UrbanDictionaryModule extends CommandModule {
-
-    /**
-     * Bold encapsulation string.
-     */
-    private static final String BOLD = "\u0002";
 
     /**
      * The API URL.
@@ -136,17 +132,8 @@ public final class UrbanDictionaryModule extends CommandModule {
     private String formatUrbanDictionaryQuery(UrbanDictionaryQuery q, int entryNo) {
         List l = q.getList().get(entryNo);
         return String.format("%s: %s [by %s +%d/-%d]",
-                wrapBold(l.getWord()), l.getDefinition().replaceAll("\r", "").replaceAll("\n", " "),
+                StringHelper.wrapBold(l.getWord()), l.getDefinition().replaceAll("\r", "").replaceAll("\n", " "),
                 l.getAuthor(), l.getThumbsUp(), l.getThumbsDown());
-    }
-
-    /**
-     * Wraps some string in bold.
-     * @param s
-     * @return
-     */
-    private static String wrapBold(String s) {
-        return BOLD + s + BOLD;
     }
 
 

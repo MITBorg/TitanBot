@@ -10,6 +10,7 @@ import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.module.modules.weather.json.*;
 import mitb.util.MathHelper;
+import mitb.util.StringHelper;
 import org.pircbotx.hooks.events.MessageEvent;
 
 import java.io.UnsupportedEncodingException;
@@ -23,23 +24,6 @@ import java.util.List;
  * A weather lookup module through the Yahoo Weather API.
  */
 public final class WeatherModule extends CommandModule {
-
-    /**
-     * Bold encapsulation string.
-     */
-    private static final String BOLD = "\u0002";
-    /**
-     * Degrees symbol.
-     */
-    private static final String DEGREES = "°";
-    /**
-     * Fahrenheit symbol.
-     */
-    private static final String FAHRENHEIT_SYMBOL = DEGREES + "F";
-    /**
-     * Celsius symbol.
-     */
-    private static final String CELSIUS_SYMBOL = DEGREES + "C";
 
     private static final String API_URL_PART_1 = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22";
     private static final String API_URL_PART_2 = "%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
@@ -178,51 +162,41 @@ public final class WeatherModule extends CommandModule {
         
         // Location
         Location l = c.getLocation();
-        sb.append(wrapBold(l.getCity() + ", " + l.getCountry())).append(": ");
+        sb.append(StringHelper.wrapBold(l.getCity() + ", " + l.getCountry())).append(": ");
         
         // Wind
         Wind w = c.getWind();
-        sb.append("Wind: Chill: ").append(w.getChill()).append(u.getSpeed())
-            .append(", Speed: ").append(w.getSpeed())
-            .append(u.getSpeed()).append(" | ");
+        sb.append("Wind: Chill: ").append(StringHelper.wrapBold(w.getChill() + u.getSpeed()))
+            .append(", Speed: ").append(StringHelper.wrapBold(w.getSpeed() + u.getSpeed()))
+                .append(" | ");
         
         // Atmosphere
         Atmosphere a = c.getAtmosphere();
-        sb.append("Humidity: ").append(a.getHumidity()).append("%")
-            .append(", Pressure: ").append(a.getPressure()).append(u.getPressure())
+        sb.append("Humidity: ").append(StringHelper.wrapBold(a.getHumidity() + "%"))
+            .append(", Pressure: ").append(StringHelper.wrapBold(a.getPressure() + u.getPressure()))
             .append(" | ");                                             
         
         // Astronomy
         Astronomy astronomy = c.getAstronomy();
-        sb.append("Sunrise: ").append(astronomy.getSunrise())
-            .append(" | Sunset: ").append(astronomy.getSunset())
+        sb.append("Sunrise: ").append(StringHelper.wrapBold(astronomy.getSunrise()))
+            .append(", Sunset: ").append(StringHelper.wrapBold(astronomy.getSunset()))
             .append(" | ");
         
         // Forecast
         sb.append("Forecast: ");
         List<Forecast> f = c.getItem().getForecast();
-        Forecast forecast = f.get(0);
+        Forecast forecast = f.get(0); // forecast for today
         
         // Calculate temperatures
-        // No imperial units here hue hue hue
-        String highC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getHigh())) + CELSIUS_SYMBOL;
-        String lowC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getLow())) + CELSIUS_SYMBOL;
+        String highF = forecast.getHigh() + StringHelper.FAHRENHEIT_SYMBOL;
+        String lowF = forecast.getLow() + StringHelper.FAHRENHEIT_SYMBOL;
+        String highC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getHigh())) + StringHelper.CELSIUS_SYMBOL;
+        String lowC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getLow())) + StringHelper.CELSIUS_SYMBOL;
         
         // Append data
-        sb.append(forecast.getDay()).append(": ")
-            .append("High: ").append(wrapBold(highC))
-            .append(" Low: ").append(wrapBold(lowC))
-            .append(" Conditions: ").append(wrapBold(forecast.getText()));
-        
+        sb.append("High: ").append(StringHelper.wrapBold(highC + "/" + highF))
+            .append(" Low: ").append(StringHelper.wrapBold(lowC + "/" + lowF))
+            .append(" Conditions: ").append(StringHelper.wrapBold(forecast.getText()));
         return sb.append(".").toString();
-    }
-    
-    /**
-     * Wraps some string in bold.
-     * @param s
-     * @return
-     */
-    private static String wrapBold(String s) {
-        return BOLD + s + BOLD;
     }
 }

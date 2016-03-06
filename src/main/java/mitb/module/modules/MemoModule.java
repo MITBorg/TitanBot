@@ -77,7 +77,6 @@ public final class MemoModule extends CommandModule {
             msg = msg.substring(0, 250 - 1 - 3) + "...";
 
         // Adding/updating message
-        // TODO dont allow adding messages for present users
         if (!targetNick.equals(callerNick)) {
             updateMessage(callerNick, targetNick, msg);
             TitanBot.sendReply(event.getOriginalEvent(), "Your message to " + targetNick + " was recorded.");
@@ -86,6 +85,10 @@ public final class MemoModule extends CommandModule {
         }
     }
 
+    /**
+     * When a user joins a channel we are in, we tell them about any memos they might have pending for them.
+     * @param event
+     */
     @Listener
     public void onJoin(JoinEvent event) {
         org.pircbotx.hooks.events.JoinEvent evt = event.getOriginalEvent();
@@ -189,7 +192,7 @@ public final class MemoModule extends CommandModule {
      */
     private List<String> getMessageSenders(String targetNick) {
         try {
-            List<String> l = new ArrayList();
+            List<String> l = new ArrayList<>();
 
             PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
                     "SELECT sender_nick FROM memo WHERE target_nick = ?"
