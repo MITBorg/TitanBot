@@ -163,7 +163,7 @@ public final class WeatherModule extends CommandModule {
             return null;
         }
     }
-
+    
     /**
      * Formats the given query for output.
      * @param query
@@ -172,61 +172,51 @@ public final class WeatherModule extends CommandModule {
     private String formatWeatherQuery(Query query) {
         StringBuilder sb = new StringBuilder();
         Channel c = query.getResults().getChannel();
-
+        
         // Units
         Units u = c.getUnits();
-
+        
         // Location
         Location l = c.getLocation();
         sb.append(wrapBold(l.getCity() + ", " + l.getCountry())).append(": ");
-
+        
         // Wind
         Wind w = c.getWind();
-        sb.append("Wind: Chill is ").append(w.getChill()).append(u.getSpeed())
-                .append(", Direction is ").append(w.getDirection()).append(DEGREES)
-                .append(", Speed is ").append(w.getSpeed())
-                .append(u.getSpeed()).append("; ");
-
+        sb.append("Wind: Chill: ").append(w.getChill()).append(u.getSpeed())
+            .append(", Speed: ").append(w.getSpeed())
+            .append(u.getSpeed()).append(" | ");
+        
         // Atmosphere
         Atmosphere a = c.getAtmosphere();
-        sb.append("Atmosphere: Humidity is ").append(a.getHumidity()).append("%")
-                .append(", Pressure is ").append(a.getPressure()).append(u.getPressure())
-                .append(", Visibility is ").append(a.getVisibility())
-                .append(u.getDistance()).append("; ");
-
+        sb.append("Humidity: ").append(a.getHumidity()).append("%")
+            .append(", Pressure: ").append(a.getPressure()).append(u.getPressure())
+            .append(" | ");                                             
+        
         // Astronomy
         Astronomy astronomy = c.getAstronomy();
-        sb.append("Astronomy: Sunrise is at ").append(astronomy.getSunrise())
-                .append(" and Sunset is at ").append(astronomy.getSunset())
-                .append("; ");
-
+        sb.append("Sunrise: ").append(astronomy.getSunrise())
+            .append(" | Sunset: ").append(astronomy.getSunset())
+            .append(" | ");
+        
         // Forecast
         sb.append("Forecast: ");
         List<Forecast> f = c.getItem().getForecast();
-
-        for (int i = 0; i < f.size(); i++) {
-            Forecast forecast = f.get(i);
-
-            // Calculate temperatures
-            String highF = forecast.getHigh() + FAHRENHEIT_SYMBOL;
-            String lowF = forecast.getLow() + FAHRENHEIT_SYMBOL;
-            String highC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getHigh())) + CELSIUS_SYMBOL;
-            String lowC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getLow())) + CELSIUS_SYMBOL;
-
-            // Append data
-            sb.append(forecast.getDay()).append(": ")
-                    .append("High is ").append(wrapBold(highF + "/" + highC))
-                    .append(" Low is ").append(wrapBold(lowF + "/" + lowC))
-                    .append(" Conditions are ").append(wrapBold(forecast.getText()));
-
-            // Not adding a comma at the end
-            if (i + 1 < f.size()) {
-                sb.append(", ");
-            }
-        }
+        Forecast forecast = f.get(0);
+        
+        // Calculate temperatures
+        // No imperial units here hue hue hue
+        String highC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getHigh())) + CELSIUS_SYMBOL;
+        String lowC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getLow())) + CELSIUS_SYMBOL;
+        
+        // Append data
+        sb.append(forecast.getDay()).append(": ")
+            .append("High: ").append(wrapBold(highC))
+            .append(" Low: ").append(wrapBold(lowC))
+            .append(" Conditions: ").append(wrapBold(forecast.getText()));
+        
         return sb.append(".").toString();
     }
-
+    
     /**
      * Wraps some string in bold.
      * @param s
