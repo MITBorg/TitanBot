@@ -28,6 +28,7 @@ fabric.properties
 logs/
 target/
 
+/src/main/resources/props.properties
 # Our app files
 database.db
 src/main/resources/props.properties
