@@ -1,8 +1,8 @@
 bot.nick=TitanBot
 bot.version=1.0.0
 bot.real_name=TitanBot
-bot.username=fucknokip
-irc.server=irc.moparisthebest.com
+bot.username=TitanBot
+irc.server=irc.server.com
 irc.port=6697
 rate=0.4
 urbandict.api_key=NONE

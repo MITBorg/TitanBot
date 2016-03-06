@@ -58,7 +58,7 @@ public class TitanBot {
                 .addAutoJoinChannel("#mopar")
                 .addListener(new IRCListener())
                 .addCapHandler(new TLSCapHandler((SSLSocketFactory) SSLSocketFactory.getDefault(), true))
-                .addServer(Properties.getValue("irc.server"), 6697)
+                .addServer(Properties.getValue("irc.server"), Properties.getValueAsInt("irc.port"))
                 .buildConfiguration();
 
         PircBotX bot = new PircBotX(configuration);
