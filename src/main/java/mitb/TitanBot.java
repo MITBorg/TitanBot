@@ -32,7 +32,7 @@ import java.util.List;
 public final class TitanBot {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(TitanBot.class);
-    private static final RateLimiter RATE_LIMITER = RateLimiter.create(Double.parseDouble(Properties.getValue("rate")));
+    private static final RateLimiter RATE_LIMITER = RateLimiter.create(Properties.getValueAsDouble("rate"));
     public static final List<Module> MODULES = new ArrayList<>();
     public static Connection databaseConnection;
 
@@ -55,7 +55,7 @@ public final class TitanBot {
                 .setAutoNickChange(true)
                 .setAutoReconnect(true)
                 .setAutoSplitMessage(false)
-                .addAutoJoinChannel("#mopar")
+                .addAutoJoinChannel(Properties.getValue("irc.autojoin_channel"))
                 .addListener(new IRCListener())
                 .addCapHandler(new TLSCapHandler((SSLSocketFactory) SSLSocketFactory.getDefault(), true))
                 .addServer(Properties.getValue("irc.server"), Properties.getValueAsInt("irc.port"))

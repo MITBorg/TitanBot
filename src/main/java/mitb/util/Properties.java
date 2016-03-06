@@ -31,4 +31,14 @@ public final class Properties {
     public static int getValueAsInt(String key) {
         return Integer.parseInt(RESOURCE_BUNDLE.getString(key));
     }
+
+    /**
+     * Get a value from the configuration file and return it.
+     *
+     * @param key key to get value from
+     * @return configuration value
+     */
+    public static double getValueAsDouble(String key) {
+        return Double.parseDouble(RESOURCE_BUNDLE.getString(key));
+    }
 }

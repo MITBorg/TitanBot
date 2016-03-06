@@ -4,6 +4,7 @@ bot.real_name=TitanBot
 bot.username=TitanBot
 irc.server=irc.server.com
 irc.port=6697
+irc.autojoin_channel=#test
 rate=0.4
 urbandict.api_key=NONE
 wolfram.api_key=NONE
