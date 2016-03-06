@@ -5,7 +5,7 @@ import java.util.ResourceBundle;
 /**
  * Provides helper methods for dealing with properties files.
  */
-public class Properties {
+public final class Properties {
     private static final ResourceBundle RESOURCE_BUNDLE;
 
     static {

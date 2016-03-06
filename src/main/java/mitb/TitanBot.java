@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Main class for TitanBot. Handles the main functionality of the bot.
  */
-public class TitanBot {
+public final class TitanBot {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(TitanBot.class);
     private static final RateLimiter RATE_LIMITER = RateLimiter.create(Double.parseDouble(Properties.getValue("rate")));

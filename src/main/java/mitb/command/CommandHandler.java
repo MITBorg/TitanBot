@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Handles everything to do with bot commands
  */
-public class CommandHandler {
+public final class CommandHandler {
     private final static Map<String, List<CommandListener>> listeners = new HashMap<>();
 
     /**

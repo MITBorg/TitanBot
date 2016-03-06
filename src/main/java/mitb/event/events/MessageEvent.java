@@ -6,7 +6,7 @@ import mitb.event.ProxyEvent;
 /**
  * Fired whenever a message is sent in a channel.
  */
-public class MessageEvent implements Event, ProxyEvent {
+public final class MessageEvent implements Event, ProxyEvent {
     private org.pircbotx.hooks.events.MessageEvent event = null;
 
     public MessageEvent(org.pircbotx.hooks.events.MessageEvent originalEvent) {

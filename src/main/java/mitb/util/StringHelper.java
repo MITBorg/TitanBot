@@ -16,7 +16,7 @@ public final class StringHelper {
     /**
      * Degrees symbol.
      */
-    public static final String DEGREES_SYMBOL = "°";
+    private static final String DEGREES_SYMBOL = "°";
     /**
      * Fahrenheit symbol.
      */

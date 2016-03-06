@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * This event is fired whenever a command is sent to the bot.
  */
-public class CommandEvent implements Event, ProxyEvent {
+public final class CommandEvent implements Event, ProxyEvent {
     private final String msg;
     private final GenericMessageEvent event;
 

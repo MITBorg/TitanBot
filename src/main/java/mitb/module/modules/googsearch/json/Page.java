@@ -1,6 +1,6 @@
 package mitb.module.modules.googsearch.json;
 
-public final class Page {
+final class Page {
 
     private String start;
     private long label;

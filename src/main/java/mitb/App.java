@@ -2,7 +2,7 @@ package mitb;
 
 import mitb.util.Properties;
 
-class App {
+public final class App {
     /**
      * Main entry point to the application.
      *

@@ -13,7 +13,7 @@ import org.pircbotx.output.OutputIRC;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IRCListener extends ListenerAdapter {
+public final class IRCListener extends ListenerAdapter {
     /**
      * Join the channel automatically when invited.
      *
