@@ -43,4 +43,13 @@ public final class StringHelper {
     public static String wrapItalic(String s) {
         return ITALIC + s + ITALIC;
     }
+
+    /**
+     * Strips carriage feed and new lines from the given string.
+     * @param s
+     * @return
+     */
+    public static String stripNewlines(String s) {
+        return s.replaceAll("\r", "").replaceAll("\n", "");
+    }
 }

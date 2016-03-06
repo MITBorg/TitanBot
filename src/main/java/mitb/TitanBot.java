@@ -144,6 +144,7 @@ public class TitanBot {
         MODULES.add(new FlameBotModule());
         MODULES.add(new GoogleSearchModule());
         MODULES.add(new QuotesModule());
+        MODULES.add(new WolframEvaluationModule());
 
         LOGGER.info("Registered all modules.");
     }

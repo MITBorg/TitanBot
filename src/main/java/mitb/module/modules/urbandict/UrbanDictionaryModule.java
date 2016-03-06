@@ -52,6 +52,12 @@ public final class UrbanDictionaryModule extends CommandModule {
             return;
         }
 
+        // Checking if api key is set
+        if (API_KEY.equalsIgnoreCase("NONE")) {
+            TitanBot.sendReply(event.getOriginalEvent(), "API key for wolfram is not configured.");
+            return;
+        }
+
         // Checking if we are getting a custom entry id
         EntryValuePair entryValue = getEntryValues(event);
         final int finalEntryNo = entryValue.getEntryNumber();
@@ -136,7 +142,7 @@ public final class UrbanDictionaryModule extends CommandModule {
     private String formatUrbanDictionaryQuery(UrbanDictionaryQuery q, int entryNo) {
         List l = q.getList().get(entryNo);
         return String.format("%s: %s [by %s +%d/-%d]",
-                StringHelper.wrapBold(l.getWord()), l.getDefinition().replaceAll("\r", "").replaceAll("\n", " "),
+                StringHelper.wrapBold(l.getWord()), StringHelper.stripNewlines(l.getDefinition()),
                 l.getAuthor(), l.getThumbsUp(), l.getThumbsDown());
     }
 

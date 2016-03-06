@@ -93,8 +93,8 @@ public final class GoogleSearchModule extends CommandModule {
                             // Strip out html tags and new lines
                             HtmlToPlainText htpt = new HtmlToPlainText();
                             String title = htpt.getPlainText(Jsoup.parse(results.get(finalEntryNo).getTitle()));
-                            String content = htpt.getPlainText(Jsoup.parse(results.get(finalEntryNo).getContent()))
-                                    .replaceAll("\r", "").replaceAll("\n", " ");
+                            String content =StringHelper.stripNewlines(
+                                    htpt.getPlainText(Jsoup.parse(results.get(finalEntryNo).getContent())));
                             String link = htpt.getPlainText(Jsoup.parse(results.get(finalEntryNo).getVisibleUrl()));
 
                             // Send reply

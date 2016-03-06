@@ -12,6 +12,8 @@ An IRC bot developed for the moparisthebest community using Java 8 and Maven.
 * TestCommand
 * FlameBot
 * Google Search
+* Quotes
+* Wolfram Alpha (Evaluation)
 * Help
 
 ## Contributors
