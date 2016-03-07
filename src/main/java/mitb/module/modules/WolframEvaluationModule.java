@@ -1,6 +1,8 @@
 package mitb.module.modules;
 
 import com.google.common.base.Joiner;
+import com.jcabi.xml.XML;
+import com.jcabi.xml.XMLDocument;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
@@ -12,6 +14,7 @@ import mitb.util.StringHelper;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,14 +31,6 @@ public class WolframEvaluationModule extends CommandModule {
      * API key for wolfram.
      */
     private static final String API_KEY = Properties.getValue("wolfram.api_key");
-    /**
-     * Finds the result pod.
-     */
-    private static final Pattern RESULT_POD_PATTERN = Pattern.compile("<pod title='Result'(.*?)<\\/pod>");
-    /**
-     * Finds the plain text pattern.
-     */
-    private static final Pattern PLAIN_TEXT_PATTERN = Pattern.compile("<plaintext>(.*?)<\\/plaintext>");
 
     @Override
     public String[] getCommands() {
@@ -54,7 +49,7 @@ public class WolframEvaluationModule extends CommandModule {
      */
     @Override
     public void onCommand(CommandEvent event) {
-        // TODO cache queries using a FIFO structure
+        // TODO cache queries using a FIFO structure, but note some queries give dynamic results (i.e. give me a joke)
         if (event.getArgs().length == 0)
             return;
 
@@ -110,20 +105,22 @@ public class WolframEvaluationModule extends CommandModule {
      * @return Result (in plaintext) or null if not found.
      */
     private String parseResult(String content) {
-        // TODO use proper xml parsing OR optimise
-        content = StringHelper.stripNewlines(content).replaceAll("   ", " ");
+        XML xml = new XMLDocument(content);
 
-        // Step 2. regex out the region of interest
-        Matcher resultMatcher = RESULT_POD_PATTERN.matcher(content);
+        // Exact result response
+        List exactResults = xml.xpath("/queryresult/pod[@title='Exact result']/subpod/plaintext/text()");
 
-        if (resultMatcher.find()) {
-            String resultPod = resultMatcher.group(0);
-
-            // Now extract answer
-            Matcher plaintextMatcher = PLAIN_TEXT_PATTERN.matcher(resultPod);
-            return plaintextMatcher.find() ? plaintextMatcher.group(0).substring(11, plaintextMatcher.group(0).length() - 12) : null;
+        if (exactResults.size() > 0) {
+            return exactResults.get(0).toString();
         }
-        return null;
+
+        // Result response
+        List results = xml.xpath("/queryresult/pod[@title='Result']/subpod/plaintext/text()");
+
+        if (results.size() > 0) {
+            return results.get(0).toString();
+        }
+        return null; // Fall-back no result found
     }
 
     @Override

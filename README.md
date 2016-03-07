@@ -1,7 +1,6 @@
 # TitanBot #
 
 An IRC bot developed for the moparisthebest community using Java 8 and Maven.
-The bot will only connect using SSL.
 
 ## Modules
 * Weather
