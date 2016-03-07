@@ -13,6 +13,7 @@ import mitb.util.MathHelper;
 import mitb.util.Properties;
 import mitb.util.StringHelper;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.PrivateMessageEvent;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -66,7 +67,15 @@ public final class WeatherModule extends CommandModule {
 
         // TODO cache results to speed up repeat queries
         boolean useCachedLocation = false;
-        String callerNick = ((MessageEvent)event.getSource()).getUser().getNick();
+        String callerNick;
+
+        if (event.getSource() instanceof PrivateMessageEvent) {
+            callerNick = ((PrivateMessageEvent)event.getSource()).getUser().getNick().toLowerCase();
+        } else if (event.getSource() instanceof MessageEvent) {
+            callerNick = ((MessageEvent)event.getSource()).getUser().getNick().toLowerCase();
+        } else {
+            return; // invalid event source type
+        }
 
         // Checking if we should use a cached location for the user
         if (event.getArgs().length == 0) {
