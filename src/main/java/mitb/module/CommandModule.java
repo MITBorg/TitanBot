@@ -14,5 +14,4 @@ public abstract class CommandModule extends Module implements CommandListener {
     }
 
     public abstract String[] getCommands();
-    public abstract void getHelp(CommandEvent event);
 }

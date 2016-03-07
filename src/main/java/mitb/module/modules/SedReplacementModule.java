@@ -1,7 +1,9 @@
 package mitb.module.modules;
 
+import mitb.TitanBot;
 import mitb.event.EventHandler;
 import mitb.event.Listener;
+import mitb.event.events.CommandEvent;
 import mitb.event.events.MessageEvent;
 import mitb.module.Module;
 
@@ -46,5 +48,10 @@ public final class SedReplacementModule extends Module {
     @Override
     protected void register() {
         EventHandler.register(this);
+    }
+
+    @Override
+    public void getHelp(CommandEvent event) {
+        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: s/old text/new text/");
     }
 }

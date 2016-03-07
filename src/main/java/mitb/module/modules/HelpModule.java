@@ -31,32 +31,42 @@ public final class HelpModule extends CommandModule {
     }
 
     private void sendModuleHelp(CommandEvent event) {
-        String help = event.getArgs()[0].toLowerCase();
+        String moduleName = event.getArgs()[0].toLowerCase();
 
+        // Iterating all loaded modules
         for (Module module : TitanBot.MODULES) {
-            if (module instanceof CommandModule) {
-                CommandModule commandModule = (CommandModule) module;
+            if (module instanceof CommandModule) { // Command module specialised help
+                CommandModule cmd = (CommandModule) module;
 
-                if (Arrays.asList(commandModule.getCommands()).contains(help)) {
-                    commandModule.getHelp(event);
+                if (Arrays.asList(cmd.getCommands()).contains(moduleName)) {
+                    cmd.getHelp(event);
+                    return;
+                }
+            } else { // Regular module help
+                String className = getModuleName(module);
+
+                if (className.equalsIgnoreCase(moduleName)) {
+                    module.getHelp(event);
                     return;
                 }
             }
         }
+
+        // Module not found response
+        TitanBot.sendReply(event.getOriginalEvent(), "No module found with name: " + moduleName);
     }
 
     private void sendModulesList(CommandEvent event) {
         // Generate list of modules
         StringBuilder moduleList = new StringBuilder();
 
+        // Iterating each module
         for (Module module : TitanBot.MODULES) {
-            if (module instanceof CommandModule) {
+            if (module instanceof CommandModule) { // Command module name, from commands array
                 CommandModule cmd = (CommandModule) module;
                 moduleList.append(cmd.getCommands()[0]).append(" ");
-            } else {
-                String className = module.getClass().getSimpleName();
-                String parsedClassName = className.substring(0, className.lastIndexOf("Module"));
-                moduleList.append(parsedClassName).append(" ");
+            } else { // Regular module name, derived from class name
+                moduleList.append(getModuleName(module)).append(" ");
             }
         }
 
@@ -65,7 +75,15 @@ public final class HelpModule extends CommandModule {
     }
 
     @Override
-    public void register() {
+    public void register() { }
 
+    /**
+     * Gets the name of a module class instance, without the Module at the end.
+     * @param module
+     * @return
+     */
+    private static String getModuleName(Module module) {
+        String className = module.getClass().getSimpleName();
+        return className.substring(0, className.lastIndexOf("Module"));
     }
 }

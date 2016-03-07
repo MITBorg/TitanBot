@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /**
  * A wolfram alpha expression evaluation module.
  */
-public class WolframEvaluationModule extends CommandModule {
+public final class WolframEvaluationModule extends CommandModule {
 
     /**
      * API url.

@@ -1,7 +1,9 @@
 package mitb.module.modules;
 
+import mitb.TitanBot;
 import mitb.event.EventHandler;
 import mitb.event.Listener;
+import mitb.event.events.CommandEvent;
 import mitb.event.events.JoinEvent;
 import mitb.module.Module;
 
@@ -15,12 +17,17 @@ public final class FlameBotModule extends Module {
         org.pircbotx.hooks.events.JoinEvent evt = event.getOriginalEvent();
 
         if(!evt.getUser().getNick().equals(evt.getBot().getNick()) && evt.getUser().getNick().toLowerCase().endsWith("bot")) {
-            evt.respond("im better than u scrublord");
+            evt.respond("im better than u noob bot");
         }
     }
 
     @Override
     protected void register() {
         EventHandler.register(this);
+    }
+
+    @Override
+    public void getHelp(CommandEvent event) {
+        TitanBot.sendReply(event.getOriginalEvent(), "This module messages any user who joins with nickname *bot");
     }
 }

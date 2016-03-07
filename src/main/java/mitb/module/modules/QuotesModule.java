@@ -15,7 +15,7 @@ import java.util.Arrays;
 /**
  * A quote database.
  */
-public class QuotesModule extends CommandModule {
+public final class QuotesModule extends CommandModule {
     @Override
     public String[] getCommands() {
         return new String[]{"quotes", "quote"};
