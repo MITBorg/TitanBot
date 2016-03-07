@@ -64,9 +64,9 @@ public final class HelpModule extends CommandModule {
         for (Module module : TitanBot.MODULES) {
             if (module instanceof CommandModule) { // Command module name, from commands array
                 CommandModule cmd = (CommandModule) module;
-                moduleList.append(cmd.getCommands()[0]).append(" ");
+                moduleList.append(cmd.getCommands()[0].toLowerCase()).append(" ");
             } else { // Regular module name, derived from class name
-                moduleList.append(getModuleName(module)).append(" ");
+                moduleList.append(getModuleName(module).toLowerCase()).append(" ");
             }
         }
 
