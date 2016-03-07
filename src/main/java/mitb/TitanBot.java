@@ -145,6 +145,7 @@ public final class TitanBot {
         MODULES.add(new GoogleSearchModule());
         MODULES.add(new QuotesModule());
         MODULES.add(new WolframEvaluationModule());
+        MODULES.add(new DonkModule());
 
         LOGGER.info("Registered all modules.");
     }
