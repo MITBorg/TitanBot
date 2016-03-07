@@ -25,7 +25,6 @@ public final class UrbanDictionaryModule extends CommandModule {
      * The API URL.
      */
     private static final String API_URL = "https://mashape-community-urban-dictionary.p.mashape.com/define?term=";
-
     /**
      * Our API key.
      */
@@ -98,7 +97,7 @@ public final class UrbanDictionaryModule extends CommandModule {
                         // Evaluating response
                         if (entry.getList().size() > finalEntryNo) {
                             TitanBot.sendReply(event.getSource(), formatUrbanDictionaryQuery(entry, finalEntryNo),
-                                    "... more at " + entry.getList().get(finalEntryNo).getPermalink());
+                                    "... [ more at " + entry.getList().get(finalEntryNo).getPermalink() + " ]");
                         } else {
                             String position = entryValue.isCustomEntry() ? " [at " + (finalEntryNo + 1) + "]" : "";
                             TitanBot.sendReply(event.getSource(), "There are no entries for: " + query + position);

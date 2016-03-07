@@ -66,12 +66,12 @@ public final class StringHelper {
     }
 
     /**
-     * Strips carriage feed and new lines from the given string.
+     * Strips carriage feed and new lines from the given string, new lines are replaced with spaces.
      * @param s
      * @return
      */
     public static String stripNewlines(String s) {
-        return s.replaceAll("\r", "").replaceAll("\n", "");
+        return s.replaceAll("\r", "").replaceAll("\n", " ");
     }
 
     /**

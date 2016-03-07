@@ -9,6 +9,7 @@ import mitb.module.modules.*;
 import mitb.module.modules.googsearch.GoogleSearchModule;
 import mitb.module.modules.urbandict.UrbanDictionaryModule;
 import mitb.module.modules.weather.WeatherModule;
+import mitb.module.modules.youtube.YoutubeLookupModule;
 import mitb.util.Properties;
 import mitb.util.StringHelper;
 import org.pircbotx.Configuration;
@@ -151,6 +152,7 @@ public final class TitanBot {
         MODULES.add(new AzGameModule());
         MODULES.add(new RepoModule());
         MODULES.add(new HangmanGameModule());
+        MODULES.add(new YoutubeLookupModule());
 
         LOGGER.info("Registered all modules (count=" + MODULES.size() + ").");
     }

@@ -7,7 +7,7 @@ import mitb.module.CommandModule;
 /**
  * Links the github repo of this bot.
  */
-public class RepoModule extends CommandModule {
+public final class RepoModule extends CommandModule {
 
     /**
      * The URL to this project on github.
