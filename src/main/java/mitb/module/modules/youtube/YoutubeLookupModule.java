@@ -102,7 +102,6 @@ public final class YoutubeLookupModule extends Module {
      * @param resp pretty output or null if invalid query
      */
     private String formatVideoDetails(YoutubeQuery resp) {
-        // TODO handle html entities
         StringBuilder sb = new StringBuilder();
         List<Item> items = resp.getItems();
 

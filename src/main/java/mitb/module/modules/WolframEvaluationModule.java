@@ -10,6 +10,7 @@ import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.util.Properties;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -81,8 +82,8 @@ public final class WolframEvaluationModule extends CommandModule {
                         String result = parseResult(body);
 
                         // Outputting response
-                        // TODO output html entities properly - i.e. &apos;
                         if (result != null) {
+                            result = StringEscapeUtils.unescapeHtml4(result); // unescaping character entities
                             TitanBot.sendReply(event.getSource(), query + " = " + result);
                         } else {
                             TitanBot.sendReply(event.getSource(), "No result found for: " + query);
