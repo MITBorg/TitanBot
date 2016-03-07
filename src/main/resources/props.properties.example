@@ -11,3 +11,4 @@ urbandict.api_key=NONE
 wolfram.api_key=NONE
 weather.api_key=NONE
 google.api_key=NONE
+wolfram.cache_size=20
