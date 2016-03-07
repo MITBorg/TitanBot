@@ -6,11 +6,20 @@ package mitb.util;
 public final class MathHelper {
 
     /**
-     * Converts a temperature in fahrenheit to celsius.
-     * @param f The temperature in fahrenheit.
+     * Converts a temperature in kelvins to celsius.
+     * @param k The temperature in kelvins.
      * @return The temperature in celsius.
      */
-    public static int fahrenheitToCelsius(int f) {
-        return (((f-32)*5)/9);
+    public static double kelvinsToCelsius(double k) {
+        return k - 273.15;
+    }
+
+    /**
+     * Converts a temperature in kelvins to fahrenheit.
+     * @param k The temperature in kelvins.
+     * @return The temperature in fahrenheit.
+     */
+    public static double kelvinsToFahrenheit(double k) {
+        return ((k - 273.15) * 1.8) + 32;
     }
 }

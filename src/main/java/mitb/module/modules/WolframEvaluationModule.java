@@ -84,6 +84,7 @@ public final class WolframEvaluationModule extends CommandModule {
                         String result = parseResult(body);
 
                         // Outputting response
+                        // TODO output html entities properly - i.e. &apos;
                         if (result != null) {
                             TitanBot.sendReply(event.getOriginalEvent(), query + " = " + result);
                         } else {

@@ -8,3 +8,4 @@ irc.autojoin_channel=#test
 rate=0.4
 urbandict.api_key=NONE
 wolfram.api_key=NONE
+weather.api_key=NONE

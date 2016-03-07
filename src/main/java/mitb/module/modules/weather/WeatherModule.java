@@ -10,6 +10,7 @@ import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.module.modules.weather.json.*;
 import mitb.util.MathHelper;
+import mitb.util.Properties;
 import mitb.util.StringHelper;
 import org.pircbotx.hooks.events.MessageEvent;
 
@@ -18,15 +19,27 @@ import java.net.URLEncoder;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * A weather lookup module through the Yahoo Weather API.
  */
 public final class WeatherModule extends CommandModule {
 
-    private static final String API_URL_PART_1 = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22";
-    private static final String API_URL_PART_2 = "%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
+    /**
+     * The API URL.
+     */
+    private static final String API_URL= "http://api.openweathermap.org/data/2.5/weather?q=";
+    /**
+     * API key for wolfram.
+     */
+    private static final String API_KEY = Properties.getValue("weather.api_key");
+    /**
+     * Date time formatting for sunrise/sunset times.
+     */
+    private static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     @Override
     public String[] getCommands() {
@@ -45,6 +58,12 @@ public final class WeatherModule extends CommandModule {
      */
     @Override
     public void onCommand(CommandEvent event) {
+        // Checking if api key is set
+        if (API_KEY.equalsIgnoreCase("NONE")) {
+            TitanBot.sendReply(event.getOriginalEvent(), "API key for weather is not configured.");
+            return;
+        }
+
         // TODO cache results to speed up repeat queries
         boolean useCachedLocation = false;
         String callerNick = ((MessageEvent)event.getOriginalEvent()).getUser().getNick();
@@ -70,9 +89,9 @@ public final class WeatherModule extends CommandModule {
             TitanBot.sendReply(event.getOriginalEvent(), "Error encoding query for weather.");
             return;
         }
-        String url = API_URL_PART_1 + sanitizedLocation + API_URL_PART_2; // XXX clean up this garbage
 
         // Api call
+        String url = API_URL + sanitizedLocation + "&appid=" + API_KEY;
         final boolean finalUseCachedLocation = useCachedLocation;
 
         AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
@@ -87,10 +106,10 @@ public final class WeatherModule extends CommandModule {
                         WeatherQuery resp = new Gson().fromJson(body, WeatherQuery.class);
 
                         // Evaluating response
-                        if (resp.getQuery().getResults() == null) {
+                        if (resp == null || resp.getCod() != 200) {
                             TitanBot.sendReply(event.getOriginalEvent(), "There is no data for location: " + location);
                         } else {
-                            TitanBot.sendReply(event.getOriginalEvent(), formatWeatherQuery(resp.getQuery()));
+                            TitanBot.sendReply(event.getOriginalEvent(), formatWeatherQuery(resp));
 
                             // Update database if necessary
                             if (!finalUseCachedLocation) {
@@ -149,54 +168,42 @@ public final class WeatherModule extends CommandModule {
     }
     
     /**
-     * Formats the given query for output.
+     * Formats the given query for pretty output.
      * @param query
      * @return
      */
-    private String formatWeatherQuery(Query query) {
+    private String formatWeatherQuery(WeatherQuery query) {
         StringBuilder sb = new StringBuilder();
-        Channel c = query.getResults().getChannel();
-        
-        // Units
-        Units u = c.getUnits();
-        
+
+        // Check api output size
+        if (query.getWeather().size() == 0) {
+            return "Erroneous API output detected.";
+        }
+
+        Weather w = query.getWeather().get(0);
+
         // Location
-        Location l = c.getLocation();
-        sb.append(StringHelper.wrapBold(l.getCity() + ", " + l.getCountry())).append(": ");
-        
-        // Wind
-        Wind w = c.getWind();
-        sb.append("Wind: Chill: ").append(StringHelper.wrapBold(w.getChill() + u.getSpeed()))
-            .append(", Speed: ").append(StringHelper.wrapBold(w.getSpeed() + u.getSpeed()))
+        sb.append(StringHelper.wrapBold(query.getName() + ", " + query.getSys().getCountry())).append(": ");
+
+        // Current temperature
+        double tempK = query.getMain().getTemp();
+        int tempC = (int)MathHelper.kelvinsToCelsius(tempK);
+        int tempF = (int)MathHelper.kelvinsToFahrenheit(tempK);
+        sb.append("Current Temperature: ").append(StringHelper.wrapBold(tempC + StringHelper.CELSIUS_SYMBOL))
+                .append("/").append(StringHelper.wrapBold(tempF + StringHelper.FAHRENHEIT_SYMBOL))
+                .append(", Description: ").append(StringHelper.wrapBold(w.getDescription())).append(" | ");
+
+        // Weather conditions
+        sb.append("Conditions: Wind Speed: ").append(StringHelper.wrapBold(query.getWind().getSpeed() + "m/s"))
+                .append(", Humidity: ").append(StringHelper.wrapBold(query.getMain().getHumidity() + "%"))
                 .append(" | ");
-        
-        // Atmosphere
-        Atmosphere a = c.getAtmosphere();
-        sb.append("Humidity: ").append(StringHelper.wrapBold(a.getHumidity() + "%"))
-            .append(", Pressure: ").append(StringHelper.wrapBold(a.getPressure() + u.getPressure()))
-            .append(" | ");                                             
-        
-        // Astronomy
-        Astronomy astronomy = c.getAstronomy();
-        sb.append("Sunrise: ").append(StringHelper.wrapBold(astronomy.getSunrise()))
-            .append(", Sunset: ").append(StringHelper.wrapBold(astronomy.getSunset()))
-            .append(" | ");
-        
-        // Forecast
-        sb.append("Forecast: ");
-        List<Forecast> f = c.getItem().getForecast();
-        Forecast forecast = f.get(0); // forecast for today
-        
-        // Calculate temperatures
-        String highF = forecast.getHigh() + StringHelper.FAHRENHEIT_SYMBOL;
-        String lowF = forecast.getLow() + StringHelper.FAHRENHEIT_SYMBOL;
-        String highC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getHigh())) + StringHelper.CELSIUS_SYMBOL;
-        String lowC = MathHelper.fahrenheitToCelsius(Integer.parseInt(forecast.getLow())) + StringHelper.CELSIUS_SYMBOL;
-        
-        // Append data
-        sb.append("High: ").append(StringHelper.wrapBold(highC + "/" + highF))
-            .append(" Low: ").append(StringHelper.wrapBold(lowC + "/" + lowF))
-            .append(" Conditions: ").append(StringHelper.wrapBold(forecast.getText()));
-        return sb.append(".").toString();
+
+        // Sunrise/Sunset
+        Date sunriseTime = new Date(query.getSys().getSunrise() * 1000);
+        Date sunsetTime = new Date(query.getSys().getSunset() * 1000);
+
+        sb.append("Sunrise: ").append(StringHelper.wrapBold(dateFormat.format(sunriseTime) + " GMT"))
+                .append(", Sunset: ").append(StringHelper.wrapBold(dateFormat.format(sunsetTime) + " GMT"));
+        return sb.toString();
     }
 }

@@ -2,17 +2,14 @@ package mitb.module.modules.weather.json;
 
 public final class Wind {
 
-    private String chill;
-    private String direction;
-    private String speed;
+    public double speed;
+    public double deg;
 
-    public String getChill() {
-        return chill;
-    }
-    public String getDirection() {
-        return direction;
-    }
-    public String getSpeed() {
+    public double getSpeed() {
         return speed;
+    }
+
+    public double getDeg() {
+        return deg;
     }
 }
