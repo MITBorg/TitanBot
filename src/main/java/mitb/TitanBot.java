@@ -147,6 +147,7 @@ public final class TitanBot {
         MODULES.add(new WolframEvaluationModule());
         MODULES.add(new DonkModule());
         MODULES.add(new AzGameModule());
+        MODULES.add(new RepoModule());
 
         LOGGER.info("Registered all modules.");
     }
