@@ -10,6 +10,7 @@ import mitb.module.modules.googsearch.GoogleSearchModule;
 import mitb.module.modules.urbandict.UrbanDictionaryModule;
 import mitb.module.modules.weather.WeatherModule;
 import mitb.util.Properties;
+import mitb.util.StringHelper;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
@@ -42,6 +43,7 @@ public final class TitanBot {
     public void run() throws Exception {
         databaseConnection = DriverManager.getConnection("jdbc:sqlite:database.db");
 
+        StringHelper.loadWordList(Properties.getValue("wordlist"));
         EventHandler.register(new CommandHandler());
         this.registerModules();
         this.createTables();
@@ -148,8 +150,9 @@ public final class TitanBot {
         MODULES.add(new DonkModule());
         MODULES.add(new AzGameModule());
         MODULES.add(new RepoModule());
+        MODULES.add(new HangmanGameModule());
 
-        LOGGER.info("Registered all modules.");
+        LOGGER.info("Registered all modules (count=" + MODULES.size() + ").");
     }
 
     /**
