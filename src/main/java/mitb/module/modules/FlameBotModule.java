@@ -14,7 +14,7 @@ public final class FlameBotModule extends Module {
 
     @Listener
     public void onJoin(JoinEvent event) {
-        org.pircbotx.hooks.events.JoinEvent evt = event.getOriginalEvent();
+        org.pircbotx.hooks.events.JoinEvent evt = event.getSource();
 
         if(!evt.getUser().getNick().equals(evt.getBot().getNick()) && evt.getUser().getNick().toLowerCase().endsWith("bot")) {
             evt.respond("im better than u noob bot");
@@ -28,6 +28,6 @@ public final class FlameBotModule extends Module {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "This module messages any user who joins with nickname *bot");
+        TitanBot.sendReply(event.getSource(), "This module messages any user who joins with nickname *bot");
     }
 }

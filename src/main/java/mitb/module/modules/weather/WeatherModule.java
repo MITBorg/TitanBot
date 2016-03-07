@@ -48,7 +48,7 @@ public final class WeatherModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " (location)");
+        TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " (location)");
     }
 
     /**
@@ -60,13 +60,13 @@ public final class WeatherModule extends CommandModule {
     public void onCommand(CommandEvent event) {
         // Checking if api key is set
         if (API_KEY.equalsIgnoreCase("NONE")) {
-            TitanBot.sendReply(event.getOriginalEvent(), "API key for weather is not configured.");
+            TitanBot.sendReply(event.getSource(), "API key for weather is not configured.");
             return;
         }
 
         // TODO cache results to speed up repeat queries
         boolean useCachedLocation = false;
-        String callerNick = ((MessageEvent)event.getOriginalEvent()).getUser().getNick();
+        String callerNick = ((MessageEvent)event.getSource()).getUser().getNick();
 
         // Checking if we should use a cached location for the user
         if (event.getArgs().length == 0) {
@@ -79,14 +79,14 @@ public final class WeatherModule extends CommandModule {
 
         // Ensure cached location was found
         if (location == null) {
-            TitanBot.sendReply(event.getOriginalEvent(), "There is no cached location for your nickname.");
+            TitanBot.sendReply(event.getSource(), "There is no cached location for your nickname.");
             return;
         }
 
         try {
             sanitizedLocation = URLEncoder.encode(location, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            TitanBot.sendReply(event.getOriginalEvent(), "Error encoding query for weather.");
+            TitanBot.sendReply(event.getSource(), "Error encoding query for weather.");
             return;
         }
 
@@ -107,9 +107,9 @@ public final class WeatherModule extends CommandModule {
 
                         // Evaluating response
                         if (resp == null || resp.getCod() != 200) {
-                            TitanBot.sendReply(event.getOriginalEvent(), "There is no data for location: " + location);
+                            TitanBot.sendReply(event.getSource(), "There is no data for location: " + location);
                         } else {
-                            TitanBot.sendReply(event.getOriginalEvent(), formatWeatherQuery(resp));
+                            TitanBot.sendReply(event.getSource(), formatWeatherQuery(resp));
 
                             // Update database if necessary
                             if (!finalUseCachedLocation) {

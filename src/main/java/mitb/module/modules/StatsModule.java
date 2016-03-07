@@ -24,7 +24,7 @@ public final class StatsModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0]);
+        TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0]);
     }
 
     @Override
@@ -36,7 +36,7 @@ public final class StatsModule extends CommandModule {
                 .withZone(ZoneId.systemDefault())
                 .format(Instant.now().minus(uptime, ChronoUnit.MILLIS));
 
-        TitanBot.sendReply(commandEvent.getOriginalEvent(), "Up since " + started + ". Currently under load " + load + ". Accepting donations for a better server.");
+        TitanBot.sendReply(commandEvent.getSource(), "Up since " + started + ". Currently under load " + load + ". Accepting donations for a better server.");
     }
 
     @Override

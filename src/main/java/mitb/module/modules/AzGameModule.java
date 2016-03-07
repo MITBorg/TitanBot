@@ -48,7 +48,7 @@ public final class AzGameModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: az start | az stop | az range | Type single words in channel.");
+        TitanBot.sendReply(event.getSource(), "Syntax: az start | az stop | az range | Type single words in channel.");
     }
 
     /**
@@ -63,7 +63,7 @@ public final class AzGameModule extends CommandModule {
 
         // Checking if word list was loaded
         if (!wordListLoaded || wordList == null || wordList.length == 0) {
-            TitanBot.sendReply(event.getOriginalEvent(), "No word list was loaded for a-z.");
+            TitanBot.sendReply(event.getSource(), "No word list was loaded for a-z.");
             return;
         }
 
@@ -71,41 +71,41 @@ public final class AzGameModule extends CommandModule {
         String cmd = event.getArgs()[0];
         String channel;
 
-        if (event.getOriginalEvent() instanceof org.pircbotx.hooks.events.MessageEvent) {
-            channel = ((org.pircbotx.hooks.events.MessageEvent)event.getOriginalEvent()).getChannelSource();
+        if (event.getSource() instanceof org.pircbotx.hooks.events.MessageEvent) {
+            channel = ((org.pircbotx.hooks.events.MessageEvent)event.getSource()).getChannelSource();
         } else {
             return; // private message to bot, so we ignore it
         }
 
         if (cmd.equals("start")) { // starts a game session for a channel
-            if (event.getOriginalEvent().getBot().getUserChannelDao().containsChannel(channel)) {
+            if (event.getSource().getBot().getUserChannelDao().containsChannel(channel)) {
                 GameSession session = gameSessions.get(channel);
 
                 if (session == null) { // no game session, start session
                     String word = getRandomWord();
                     gameSessions.put(channel, new GameSession(word));
-                    sendUpdate(event.getOriginalEvent().getBot(), channel);
+                    sendUpdate(event.getSource().getBot(), channel);
                     TitanBot.LOGGER.info("A-Z instance for " + channel + " with solution: " + word);
                 } else { // game in progress, nothing to do
-                    TitanBot.sendReply(event.getOriginalEvent(), "A game session for this channel already exists, try checking the progress.");
+                    TitanBot.sendReply(event.getSource(), "A game session for this channel already exists, try checking the progress.");
                 }
             } else {
-                TitanBot.sendReply(event.getOriginalEvent(), "I am not in that channel and so cannot create a game session for it.");
+                TitanBot.sendReply(event.getSource(), "I am not in that channel and so cannot create a game session for it.");
             }
         } else if (cmd.equals("stop")) { // stops a game session for a channel
             GameSession session = gameSessions.get(channel);
 
             if (session != null) {
                 gameSessions.remove(channel);
-                TitanBot.sendReply(event.getOriginalEvent(), "Game session ended, the word was: " + session.getWord());
+                TitanBot.sendReply(event.getSource(), "Game session ended, the word was: " + session.getWord());
             }
         } else if (cmd.equals("range")) { // displays the word range for a channel
             GameSession session = gameSessions.get(channel);
 
             if (session == null) { // not existent
-                TitanBot.sendReply(event.getOriginalEvent(), "No game session in progress for this channel. Try creating one.");
+                TitanBot.sendReply(event.getSource(), "No game session in progress for this channel. Try creating one.");
             } else { // game in progress
-                sendUpdate(event.getOriginalEvent().getBot(), channel);
+                sendUpdate(event.getSource().getBot(), channel);
             }
         }
     }
@@ -116,14 +116,14 @@ public final class AzGameModule extends CommandModule {
             return;
 
         // Check if this channel has a game session
-        String channel = event.getOriginalEvent().getChannel().getName();
+        String channel = event.getSource().getChannel().getName();
 
         if (!gameSessions.containsKey(channel))
             return;
 
         // Process message
         GameSession session = gameSessions.get(channel);
-        String word = event.getOriginalEvent().getMessage().toLowerCase();
+        String word = event.getSource().getMessage().toLowerCase();
 
         // Check if the message is a valid word
         if (!isWord(word))
@@ -135,15 +135,15 @@ public final class AzGameModule extends CommandModule {
         int wc = session.getWord().compareTo(word);
 
         if (session.getWord().equals(word)) { // checking if correct guess
-            TitanBot.sendReply(event.getOriginalEvent(), "This game was won by "
-                    + event.getOriginalEvent().getUser().getNick() + " who guessed the word " + word);
+            TitanBot.sendReply(event.getSource(), "This game was won by "
+                    + event.getSource().getUser().getNick() + " who guessed the word " + word);
             gameSessions.remove(channel);
         } else if (lbc < 0 && wc > 0) { // checking if new lower bound
             session.setLowerBoundWord(word);
-            sendUpdate(event.getOriginalEvent().getBot(), channel);
+            sendUpdate(event.getSource().getBot(), channel);
         } else if (upc > 0 && wc < 0) { // checking if new upper bound
             session.setUpperBoundWord(word);
-            sendUpdate(event.getOriginalEvent().getBot(), channel);
+            sendUpdate(event.getSource().getBot(), channel);
         }
     }
 

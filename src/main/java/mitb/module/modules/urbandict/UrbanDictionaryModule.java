@@ -38,7 +38,7 @@ public final class UrbanDictionaryModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " [result #] (query)");
+        TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " [result #] (query)");
     }
 
     /**
@@ -54,7 +54,7 @@ public final class UrbanDictionaryModule extends CommandModule {
 
         // Checking if api key is set
         if (API_KEY.equalsIgnoreCase("NONE")) {
-            TitanBot.sendReply(event.getOriginalEvent(), "API key for wolfram is not configured.");
+            TitanBot.sendReply(event.getSource(), "API key for wolfram is not configured.");
             return;
         }
 
@@ -64,7 +64,7 @@ public final class UrbanDictionaryModule extends CommandModule {
 
         // Validating entry number
         if (finalEntryNo < 0) {
-            TitanBot.sendReply(event.getOriginalEvent(), "Invalid definition number.");
+            TitanBot.sendReply(event.getSource(), "Invalid definition number.");
             return;
         }
 
@@ -77,7 +77,7 @@ public final class UrbanDictionaryModule extends CommandModule {
         try {
             sanitizedQuery = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            TitanBot.sendReply(event.getOriginalEvent(), "Error encoding query for urban dictionary.");
+            TitanBot.sendReply(event.getSource(), "Error encoding query for urban dictionary.");
             return;
         }
 
@@ -97,11 +97,11 @@ public final class UrbanDictionaryModule extends CommandModule {
 
                         // Evaluating response
                         if (entry.getList().size() > finalEntryNo) {
-                            TitanBot.sendReply(event.getOriginalEvent(), formatUrbanDictionaryQuery(entry, finalEntryNo),
+                            TitanBot.sendReply(event.getSource(), formatUrbanDictionaryQuery(entry, finalEntryNo),
                                     "... more at " + entry.getList().get(finalEntryNo).getPermalink());
                         } else {
                             String position = entryValue.isCustomEntry() ? " [at " + (finalEntryNo + 1) + "]" : "";
-                            TitanBot.sendReply(event.getOriginalEvent(), "There are no entries for: " + query + position);
+                            TitanBot.sendReply(event.getSource(), "There are no entries for: " + query + position);
                         }
                         return response;
                     }

@@ -37,7 +37,7 @@ public final class GoogleSearchModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " [term #] (query)");
+        TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " [term #] (query)");
     }
 
     /**
@@ -56,7 +56,7 @@ public final class GoogleSearchModule extends CommandModule {
 
         // Validating entry number
         if (finalEntryNo < 0) {
-            TitanBot.sendReply(event.getOriginalEvent(), "Invalid definition number.");
+            TitanBot.sendReply(event.getSource(), "Invalid definition number.");
             return;
         }
 
@@ -69,7 +69,7 @@ public final class GoogleSearchModule extends CommandModule {
         try {
             sanitizedQuery = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            TitanBot.sendReply(event.getOriginalEvent(), "Error encoding query for google search.");
+            TitanBot.sendReply(event.getSource(), "Error encoding query for google search.");
             return;
         }
 
@@ -98,11 +98,11 @@ public final class GoogleSearchModule extends CommandModule {
                             String link = htpt.getPlainText(Jsoup.parse(results.get(finalEntryNo).getVisibleUrl()));
 
                             // Send reply
-                            TitanBot.sendReply(event.getOriginalEvent(), StringHelper.wrapBold(title) + ": "
+                            TitanBot.sendReply(event.getSource(), StringHelper.wrapBold(title) + ": "
                                     + content + " [ More at " + link + " ]");
                         } else {
                             String position = entryValue.isCustomEntry() ? " [at " + (finalEntryNo + 1) + "]" : "";
-                            TitanBot.sendReply(event.getOriginalEvent(), "There are no entries for: " + query + position);
+                            TitanBot.sendReply(event.getSource(), "There are no entries for: " + query + position);
                         }
                         return response;
                     }

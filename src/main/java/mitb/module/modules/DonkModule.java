@@ -6,9 +6,6 @@ import mitb.event.Listener;
 import mitb.event.events.CommandEvent;
 import mitb.event.events.MessageEvent;
 import mitb.module.Module;
-import mitb.util.Properties;
-
-import java.util.Random;
 
 /**
  * In loving memory of the previous bot that did this. Previous bot name not found.
@@ -26,7 +23,7 @@ public final class DonkModule extends Module {
 
     @Listener
     public void onMessage(MessageEvent event) {
-        org.pircbotx.hooks.events.MessageEvent evt = event.getOriginalEvent();
+        org.pircbotx.hooks.events.MessageEvent evt = event.getSource();
         String msg = evt.getMessage().toLowerCase();
         String botName = evt.getBot().getNick().toLowerCase();
 
@@ -52,6 +49,6 @@ public final class DonkModule extends Module {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "This module puts a banging donk on it.");
+        TitanBot.sendReply(event.getSource(), "This module puts a banging donk on it.");
     }
 }

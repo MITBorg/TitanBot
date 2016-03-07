@@ -27,7 +27,7 @@ public final class LastSeenModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " (nick)");
+        TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " (nick)");
     }
 
     /**
@@ -52,9 +52,9 @@ public final class LastSeenModule extends CommandModule {
             Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(resultSet.getString("seen"));
             String pretty = prettyTime.format(date);
 
-            TitanBot.sendReply(commandEvent.getOriginalEvent(), "I last saw " + nick + " " + pretty + ".");
+            TitanBot.sendReply(commandEvent.getSource(), "I last saw " + nick + " " + pretty + ".");
         } catch(Exception e) {
-            TitanBot.sendReply(commandEvent.getOriginalEvent(), "I have never seen " + nick + ".");
+            TitanBot.sendReply(commandEvent.getSource(), "I have never seen " + nick + ".");
         }
     }
 
@@ -74,9 +74,9 @@ public final class LastSeenModule extends CommandModule {
             PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
                     "INSERT OR REPLACE INTO seen (id, nick, login, seen) VALUES ((SELECT id FROM seen WHERE login = ?), ?, ?, datetime())"
             );
-            statement.setString(1, event.getOriginalEvent().getUser().getLogin());
-            statement.setString(2, event.getOriginalEvent().getUser().getNick());
-            statement.setString(3, event.getOriginalEvent().getUser().getLogin());
+            statement.setString(1, event.getSource().getUser().getLogin());
+            statement.setString(2, event.getSource().getUser().getNick());
+            statement.setString(3, event.getSource().getUser().getLogin());
             statement.executeUpdate();
         } catch(SQLException e) {
             e.printStackTrace();

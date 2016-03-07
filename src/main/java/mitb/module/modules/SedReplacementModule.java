@@ -20,12 +20,12 @@ public final class SedReplacementModule extends Module {
 
     @Listener
     public void onMessage(MessageEvent event) {
-        String msg = event.getOriginalEvent().getMessage();
+        String msg = event.getSource().getMessage();
         Pattern pattern = Pattern.compile("^(?:s/((?:[^\\\\/]|\\\\.)*)/((?:[^\\\\/]|\\\\.)*)/((?:g|i|\\d+)*))(?:;s/((?:[^\\\\/]|\\\\.)*)/((?:[^\\\\/]|\\\\.)*)/((?:g|i|\\d+)*))*$");
         Matcher matcher = pattern.matcher(msg);
 
         try {
-            String nick = event.getOriginalEvent().getUser().getNick();
+            String nick = event.getSource().getUser().getNick();
 
             if (nick == null) return;
 
@@ -38,7 +38,7 @@ public final class SedReplacementModule extends Module {
                     msg = msg.replaceAll(matcher.group(4), matcher.group(5));
                 }
 
-                event.getOriginalEvent().respondWith(nick + " meant: " + msg);
+                event.getSource().respondWith(nick + " meant: " + msg);
             } else {
                 this.cache.put(nick, msg);
             }
@@ -52,6 +52,6 @@ public final class SedReplacementModule extends Module {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: s/old text/new text/");
+        TitanBot.sendReply(event.getSource(), "Syntax: s/old text/new text/");
     }
 }

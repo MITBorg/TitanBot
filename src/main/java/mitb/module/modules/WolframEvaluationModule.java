@@ -10,13 +10,10 @@ import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.util.Properties;
-import mitb.util.StringHelper;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * A wolfram alpha expression evaluation module.
@@ -39,7 +36,7 @@ public final class WolframEvaluationModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " (query)");
+        TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " (query)");
     }
 
     /**
@@ -55,7 +52,7 @@ public final class WolframEvaluationModule extends CommandModule {
 
         // Checking if api key is set
         if (API_KEY.equalsIgnoreCase("NONE")) {
-            TitanBot.sendReply(event.getOriginalEvent(), "API key for wolfram is not configured.");
+            TitanBot.sendReply(event.getSource(), "API key for wolfram is not configured.");
             return;
         }
 
@@ -66,7 +63,7 @@ public final class WolframEvaluationModule extends CommandModule {
         try {
             sanitizedQuery = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            TitanBot.sendReply(event.getOriginalEvent(), "Error encoding query for wolfram.");
+            TitanBot.sendReply(event.getSource(), "Error encoding query for wolfram.");
             return;
         }
 
@@ -86,9 +83,9 @@ public final class WolframEvaluationModule extends CommandModule {
                         // Outputting response
                         // TODO output html entities properly - i.e. &apos;
                         if (result != null) {
-                            TitanBot.sendReply(event.getOriginalEvent(), query + " = " + result);
+                            TitanBot.sendReply(event.getSource(), query + " = " + result);
                         } else {
-                            TitanBot.sendReply(event.getOriginalEvent(), "No result found for: " + query);
+                            TitanBot.sendReply(event.getSource(), "No result found for: " + query);
                         }
                         return response;
                     }

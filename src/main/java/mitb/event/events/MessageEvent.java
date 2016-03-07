@@ -13,7 +13,7 @@ public final class MessageEvent implements Event, ProxyEvent {
         this.event = originalEvent;
     }
 
-    public org.pircbotx.hooks.events.MessageEvent getOriginalEvent() {
+    public org.pircbotx.hooks.events.MessageEvent getSource() {
         return this.event;
     }
 }

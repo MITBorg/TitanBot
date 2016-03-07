@@ -18,7 +18,7 @@ public final class HelpModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " (module)");
+        TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " (module)");
     }
 
     @Override
@@ -53,7 +53,7 @@ public final class HelpModule extends CommandModule {
         }
 
         // Module not found response
-        TitanBot.sendReply(event.getOriginalEvent(), "No module found with name: " + moduleName);
+        TitanBot.sendReply(event.getSource(), "No module found with name: " + moduleName);
     }
 
     private void sendModulesList(CommandEvent event) {
@@ -71,7 +71,7 @@ public final class HelpModule extends CommandModule {
         }
 
         // Send to caller
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: help (module) | Modules: " + moduleList);
+        TitanBot.sendReply(event.getSource(), "Syntax: help (module) | Modules: " + moduleList);
     }
 
     @Override

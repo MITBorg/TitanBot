@@ -28,14 +28,14 @@ public final class MemoModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " add (target_nick) (msg) | "
+        TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " add (target_nick) (msg) | "
                 + event.getArgs()[0] + " view (sender_nick) | pending");
     }
 
     @Override
     public void onCommand(CommandEvent event) {
         // Parsing command
-        String callerNick = ((MessageEvent)event.getOriginalEvent()).getUser().getNick().toLowerCase();
+        String callerNick = ((MessageEvent)event.getSource()).getUser().getNick().toLowerCase();
         String cmd = event.getArgs()[0].toLowerCase();
 
         if (cmd.equals("add") && event.getArgs().length >= 3) { // Adding a new message
@@ -47,9 +47,9 @@ public final class MemoModule extends CommandModule {
             String msg = getPendingMessageSenders(getMessageSenders(callerNick));
 
             if (msg != null) {
-                event.getOriginalEvent().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :There are memos for you from: " + msg);
+                event.getSource().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :There are memos for you from: " + msg);
             } else {
-                event.getOriginalEvent().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :There are no memos for you.");
+                event.getSource().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :There are no memos for you.");
             }
         }
     }
@@ -65,10 +65,10 @@ public final class MemoModule extends CommandModule {
 
         // Attempting to view message
         if (msg != null) {
-            event.getOriginalEvent().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :[" + senderNick + "] " + msg); // XXX make this pretty
+            event.getSource().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :[" + senderNick + "] " + msg); // XXX make this pretty
             deleteMessage(senderNick, callerNick);
         } else {
-            TitanBot.sendReply(event.getOriginalEvent(), "There is no message for you from: " + senderNick);
+            TitanBot.sendReply(event.getSource(), "There is no message for you from: " + senderNick);
         }
     }
 
@@ -86,11 +86,11 @@ public final class MemoModule extends CommandModule {
             msg = msg.substring(0, 250 - 1 - 3) + "...";
 
         // Adding/updating message
-        if (!targetNick.equals(callerNick) && ! targetNick.equalsIgnoreCase(event.getOriginalEvent().getBot().getNick())) {
+        if (!targetNick.equals(callerNick) && ! targetNick.equalsIgnoreCase(event.getSource().getBot().getNick())) {
             updateMessage(callerNick, targetNick, msg);
-            TitanBot.sendReply(event.getOriginalEvent(), "Your message to " + targetNick + " was recorded.");
+            TitanBot.sendReply(event.getSource(), "Your message to " + targetNick + " was recorded.");
         } else {
-            TitanBot.sendReply(event.getOriginalEvent(), "You cant queue a message to yourself/the bot!");
+            TitanBot.sendReply(event.getSource(), "You cant queue a message to yourself/the bot!");
         }
     }
 
@@ -100,7 +100,7 @@ public final class MemoModule extends CommandModule {
      */
     @Listener
     public void onJoin(JoinEvent event) {
-        org.pircbotx.hooks.events.JoinEvent evt = event.getOriginalEvent();
+        org.pircbotx.hooks.events.JoinEvent evt = event.getSource();
         String targetNick = evt.getUser().getNick().toLowerCase();
 
         // Sending joined users a list of their pending memos

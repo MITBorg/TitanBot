@@ -39,12 +39,11 @@ public final class CommandEvent implements Event, ProxyEvent {
         if (args.length < 2) {
             return new String[]{};
         }
-
         return Arrays.copyOfRange(args, 1, args.length);
     }
 
     @Override
-    public GenericEvent getOriginalEvent() {
+    public GenericEvent getSource() {
         return this.event;
     }
 }

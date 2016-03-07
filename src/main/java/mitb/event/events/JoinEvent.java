@@ -13,7 +13,7 @@ public final class JoinEvent implements Event, ProxyEvent {
         this.event = originalEvent;
     }
 
-    public org.pircbotx.hooks.events.JoinEvent getOriginalEvent() {
+    public org.pircbotx.hooks.events.JoinEvent getSource() {
         return this.event;
     }
 }

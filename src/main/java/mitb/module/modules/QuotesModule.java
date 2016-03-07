@@ -23,7 +23,7 @@ public final class QuotesModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0] + " add (quote) | " + event.getArgs()[0]+ " view (number)");
+        TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " add (quote) | " + event.getArgs()[0]+ " view (number)");
     }
 
     /**
@@ -37,7 +37,7 @@ public final class QuotesModule extends CommandModule {
         if (event.getArgs().length < 1)
             return;
 
-        String callerNick = ((MessageEvent)event.getOriginalEvent()).getUser().getNick().toLowerCase();
+        String callerNick = ((MessageEvent)event.getSource()).getUser().getNick().toLowerCase();
         String cmd = event.getArgs()[0];
 
         if (cmd.equals("add") && event.getArgs().length > 1) {
@@ -63,7 +63,7 @@ public final class QuotesModule extends CommandModule {
 
         // Adding message
         insertQuote(callerNick, quote);
-        TitanBot.sendReply(event.getOriginalEvent(), "Your quote has been recorded.");
+        TitanBot.sendReply(event.getSource(), "Your quote has been recorded.");
     }
 
     /**
@@ -77,13 +77,13 @@ public final class QuotesModule extends CommandModule {
         try {
             quoteId = Integer.parseInt(event.getArgs()[1]);
         } catch (NumberFormatException ex) {
-            TitanBot.sendReply(event.getOriginalEvent(), "Invalid quote id.");
+            TitanBot.sendReply(event.getSource(), "Invalid quote id.");
             return;
         }
 
         // Display message if possible
         String msg = fetchQuote(quoteId);
-        TitanBot.sendReply(event.getOriginalEvent(), msg);
+        TitanBot.sendReply(event.getSource(), msg);
     }
 
     /**

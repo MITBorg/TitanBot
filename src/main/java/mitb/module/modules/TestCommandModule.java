@@ -12,7 +12,7 @@ public final class TestCommandModule extends CommandModule {
 
     @Override
     public void getHelp(CommandEvent event) {
-        TitanBot.sendReply(event.getOriginalEvent(), "Syntax: " + event.getArgs()[0]);
+        TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0]);
     }
 
     /**
@@ -22,7 +22,7 @@ public final class TestCommandModule extends CommandModule {
      */
     @Override
     public void onCommand(CommandEvent commandEvent) {
-        commandEvent.getOriginalEvent().respond("response from test command");
+        commandEvent.getSource().respond("response from test command");
     }
 
     @Override
