@@ -14,6 +14,7 @@ An IRC bot developed for the moparisthebest community using Java 8 and Maven.
 * Google Search
 * Quotes
 * Wolfram Alpha (Evaluation)
+* A-Z (word guessing game given a range of two words)
 * Help
 
 ## Contributors

@@ -39,6 +39,7 @@ public final class LastSeenModule extends CommandModule {
             return;
         }
 
+        // Preparing and responding using query
         String nick = Joiner.on(" ").join(commandEvent.getArgs());
 
         try {

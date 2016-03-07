@@ -36,7 +36,7 @@ public final class MemoModule extends CommandModule {
     public void onCommand(CommandEvent event) {
         // Parsing command
         String callerNick = ((MessageEvent)event.getOriginalEvent()).getUser().getNick().toLowerCase();
-        String cmd = event.getArgs()[0];
+        String cmd = event.getArgs()[0].toLowerCase();
 
         if (cmd.equals("add") && event.getArgs().length >= 3) { // Adding a new message
             addMessage(event, callerNick);
