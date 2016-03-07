@@ -32,7 +32,7 @@ public final class GoogleSearchModule extends CommandModule {
 
     @Override
     public String[] getCommands() {
-        return new String[]{"googlesearch", "g", "gsearch", "gs","googles"};
+        return new String[]{"googlesearch", "g", "gsearch", "gs","googles", "google"};
     }
 
     @Override
