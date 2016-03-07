@@ -15,7 +15,14 @@ import java.util.Random;
  */
 public final class DonkModule extends Module {
 
-    private static final double DONK_CHANCE = 1 - 0.3; // 30% chance
+    /**
+     * The delay between donk responses, in ms.
+     */
+    private static final long DONK_DELAY = 15 * 1000;
+    /**
+     * The timestamp of when the last donk response occurred in ms.
+     */
+    private long lastDonkTime;
 
     @Listener
     public void onMessage(MessageEvent event) {
@@ -24,10 +31,18 @@ public final class DonkModule extends Module {
         String botName = evt.getBot().getNick().toLowerCase();
 
         // If a message with donk in it is said, we link them to our epic meme
-        if(msg.contains("donk") && !msg.startsWith(botName) && !evt.getUser().getNick().equals(botName)
-                && Math.random() >= DONK_CHANCE) {
+        if(msg.contains("donk") && !msg.startsWith(botName) && !evt.getUser().getNick().equals(botName) && canDonk()) {
             evt.respondWith("www.youtube.co.uk/watch?v=ckMvj1piK58");
+            lastDonkTime = System.currentTimeMillis();
         }
+    }
+
+    /**
+     * If we can perform a donk response, based when on the last donk response occurred.
+     * @return
+     */
+    private boolean canDonk() {
+        return System.currentTimeMillis() - lastDonkTime > DONK_DELAY;
     }
 
     @Override
