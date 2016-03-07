@@ -14,5 +14,10 @@ public abstract class Module {
      * Called upon module register. Used for registering event listeners, etc.
      */
     protected abstract void register();
+
+    /**
+     * Displays help for this module when access, through the help module.
+     * @param event
+     */
     public abstract void getHelp(CommandEvent event);
 }

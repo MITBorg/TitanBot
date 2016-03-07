@@ -10,7 +10,6 @@ public final class App {
      */
     public static void main(String[] args) throws Exception {
         TitanBot.LOGGER.info("TitanBot v" + Properties.getValue("bot.version"));
-        TitanBot.LOGGER.info("Jordan, Pure, Bootnecklad");
         (new TitanBot()).run();
     }
 }

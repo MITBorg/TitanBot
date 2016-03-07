@@ -64,9 +64,9 @@ public final class HelpModule extends CommandModule {
         for (Module module : TitanBot.MODULES) {
             if (module instanceof CommandModule) { // Command module name, from commands array
                 CommandModule cmd = (CommandModule) module;
-                moduleList.append(cmd.getCommands()[0].toLowerCase()).append(" ");
+                moduleList.append(cmd.getCommands()[0]).append(" ");
             } else { // Regular module name, derived from class name
-                moduleList.append(getModuleName(module).toLowerCase()).append(" ");
+                moduleList.append(getModuleName(module)).append(" ");
             }
         }
 
@@ -78,12 +78,12 @@ public final class HelpModule extends CommandModule {
     public void register() { }
 
     /**
-     * Gets the name of a module class instance, without the Module at the end.
+     * Gets the name of a module class instance, without the Module at the end in lower case.
      * @param module
      * @return
      */
     private static String getModuleName(Module module) {
         String className = module.getClass().getSimpleName();
-        return className.substring(0, className.lastIndexOf("Module"));
+        return className.substring(0, className.lastIndexOf("Module")).toLowerCase();
     }
 }
