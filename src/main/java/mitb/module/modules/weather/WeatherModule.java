@@ -33,7 +33,7 @@ public final class WeatherModule extends CommandModule {
      */
     private static final String API_URL= "http://api.openweathermap.org/data/2.5/weather?q=";
     /**
-     * API key for wolfram.
+     * API key for weather.
      */
     private static final String API_KEY = Properties.getValue("weather.api_key");
     /**
