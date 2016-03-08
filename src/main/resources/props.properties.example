@@ -13,3 +13,4 @@ weather.api_key=NONE
 google.api_key=NONE
 games.restrict_channel=NO
 games.wordlist=src/main/resources/wordlist.txt
+ignore_nicks=NONE

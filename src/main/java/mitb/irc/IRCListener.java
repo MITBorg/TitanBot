@@ -22,7 +22,8 @@ public final class IRCListener extends ListenerAdapter {
     @Override
     public void onInvite(InviteEvent event) {
         new OutputIRC(event.getBot()).joinChannel(event.getChannel());
-        TitanBot.LOGGER.info("Invited to channel " + event.getChannel() + " by " + event.getUser().getNick() + "@" + event.getUser().getHostmask() + ". Joining.");
+        TitanBot.LOGGER.info("Invited to channel " + event.getChannel() + " by " + event.getUser().getNick()
+                + "@" + event.getUser().getHostmask() + ". Joining.");
     }
 
     /**

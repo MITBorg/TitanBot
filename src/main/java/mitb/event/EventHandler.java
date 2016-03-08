@@ -1,10 +1,21 @@
 package mitb.event;
 
+import mitb.util.PIrcBotXHelper;
+import mitb.util.Properties;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class EventHandler {
+
+    /**
+     * A list of ignored nicks.
+     */
+    private static final String[] IGNORED_NICKS = Properties.getValue("ignore_nicks").split(",");
+    /**
+     * Event listeners.
+     */
     private static final Map<Object, Map<Method, Class<? extends Event>>> eventListeners = new HashMap<>();
 
     /**
@@ -16,7 +27,6 @@ public final class EventHandler {
         if (eventListeners.containsKey(o)) {
             return;
         }
-
         HashMap<Method, Class<? extends Event>> list = new HashMap<>();
 
         for (Method method : o.getClass().getMethods()) {
@@ -33,6 +43,16 @@ public final class EventHandler {
      * @param event event to send out to listeners
      */
     public static void trigger(Event event) {
+        // Handle ignored nicks
+        if (ignoredNicksLoaded() &&  event instanceof ProxyEvent) {
+            ProxyEvent evt = (ProxyEvent)event;
+            String callerNick = PIrcBotXHelper.getNick(evt.getSource());
+
+            if (isIgnoredNick(callerNick))
+                return;
+        }
+
+        // Attempt trigger
         eventListeners.entrySet().stream().forEach(entry -> {
             Map<Method, Class<? extends Event>> events = entry.getValue();
 
@@ -44,5 +64,27 @@ public final class EventHandler {
                 }
             });
         });
+    }
+
+    /**
+     * If the ignored nick list is valid.
+     * @return
+     */
+    private static boolean ignoredNicksLoaded() {
+        int len = IGNORED_NICKS.length;
+        return len != 0 && !(IGNORED_NICKS[0].equalsIgnoreCase("NONE") && len == 1);
+    }
+
+    /**
+     * If the given nickname is to be ignored (i.e. in IGNORED_NICKS).
+     * @param nick
+     * @return
+     */
+    private static boolean isIgnoredNick(String nick) {
+        for (int i = 0; i < IGNORED_NICKS.length; i++) {
+            if (IGNORED_NICKS[i].equalsIgnoreCase(nick))
+                return true;
+        }
+        return false;
     }
 }
