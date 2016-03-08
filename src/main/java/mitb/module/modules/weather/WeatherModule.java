@@ -72,7 +72,6 @@ public final class WeatherModule extends CommandModule {
             return;
         }
 
-        // TODO cache results to speed up repeat queries
         boolean useCachedLocation = false;
         String callerNick = PIrcBotXHelper.getNick(event.getSource());
 
