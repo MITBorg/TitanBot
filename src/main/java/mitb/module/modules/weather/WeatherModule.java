@@ -1,6 +1,8 @@
 package mitb.module.modules.weather;
 
 import com.google.common.base.Joiner;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -23,6 +25,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A weather lookup module through the Yahoo Weather API.
@@ -41,6 +44,11 @@ public final class WeatherModule extends CommandModule {
      * Date time formatting for sunrise/sunset times.
      */
     private static DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    /**
+     * A cache for previously evaluated expressions.
+     */
+    private static final Cache<String, String> CACHE = CacheBuilder.newBuilder().maximumSize(100)
+            .expireAfterAccess(10, TimeUnit.MINUTES).build();
 
     @Override
     public String[] getCommands() {
@@ -92,6 +100,15 @@ public final class WeatherModule extends CommandModule {
             return;
         }
 
+        // Check cache
+        String result = CACHE.getIfPresent(location);
+
+        if (result != null) {
+            TitanBot.sendReply(event.getSource(), result);
+            return;
+        }
+
+        // Sanitize query
         try {
             sanitizedLocation = URLEncoder.encode(location, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -118,7 +135,13 @@ public final class WeatherModule extends CommandModule {
                         if (resp == null || resp.getCod() != 200) {
                             TitanBot.sendReply(event.getSource(), "There is no data for location: " + location);
                         } else {
-                            TitanBot.sendReply(event.getSource(), formatWeatherQuery(resp));
+                            String output = formatWeatherQuery(resp);
+
+                            // Update cache
+                            CACHE.put(location, output);
+
+                            // Send reply
+                            TitanBot.sendReply(event.getSource(), output);
 
                             // Update database if necessary
                             if (!finalUseCachedLocation) {

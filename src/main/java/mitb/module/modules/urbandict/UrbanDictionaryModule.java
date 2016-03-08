@@ -1,6 +1,8 @@
 package mitb.module.modules.urbandict;
 
 import com.google.common.base.Joiner;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -15,6 +17,7 @@ import mitb.util.StringHelper;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Queries urban dictionary through a third-party API.
@@ -29,6 +32,11 @@ public final class UrbanDictionaryModule extends CommandModule {
      * Our API key.
      */
     private static final String API_KEY = Properties.getValue("urbandict.api_key");
+    /**
+     * A cache for previously evaluated expressions.
+     */
+    private static final Cache<String, String> CACHE = CacheBuilder.newBuilder().maximumSize(100)
+            .expireAfterAccess(10, TimeUnit.MINUTES).build();
 
     @Override
     public String[] getCommands() {
@@ -67,12 +75,21 @@ public final class UrbanDictionaryModule extends CommandModule {
             return;
         }
 
-        // Construct query and sanitize for url
+        // Construct query
         String url, sanitizedQuery;
         String[] args = entryValue.isCustomEntry() ? Arrays.copyOfRange(event.getArgs(), 1, event.getArgs().length)
                 : event.getArgs();
         String query = Joiner.on(" ").join(args);
 
+        // Check cache
+        String result = CACHE.getIfPresent(query);
+
+        if (result != null) {
+            TitanBot.sendReply(event.getSource(), result);
+            return;
+        }
+
+        // Sanitize query
         try {
             sanitizedQuery = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -96,8 +113,13 @@ public final class UrbanDictionaryModule extends CommandModule {
 
                         // Evaluating response
                         if (entry.getList().size() > finalEntryNo) {
-                            TitanBot.sendReply(event.getSource(), formatUrbanDictionaryQuery(entry, finalEntryNo),
-                                    "... [ more at " + entry.getList().get(finalEntryNo).getPermalink() + " ]");
+                            String output = formatUrbanDictionaryQuery(entry, finalEntryNo);
+
+                            // Update cache
+                            CACHE.put(query, output);
+
+                            // Send reply
+                            TitanBot.sendReply(event.getSource(), output);
                         } else {
                             String position = entryValue.isCustomEntry() ? " [at " + (finalEntryNo + 1) + "]" : "";
                             TitanBot.sendReply(event.getSource(), "There are no entries for: " + query + position);
@@ -140,8 +162,18 @@ public final class UrbanDictionaryModule extends CommandModule {
      */
     private String formatUrbanDictionaryQuery(UrbanDictionaryQuery q, int entryNo) {
         List l = q.getList().get(entryNo);
+
+        // Truncate and format definition length
+        String def = l.getDefinition();
+
+        if (def.length() > 200) {
+            def = def.substring(0, 200 - 3) + "...";
+        }
+        def = StringHelper.stripNewlines(def);
+
+        // Return formatted output
         return String.format("%s: %s [by %s +%d/-%d]",
-                StringHelper.wrapBold(l.getWord()), StringHelper.stripNewlines(l.getDefinition()),
+                StringHelper.wrapBold(l.getWord()), def,
                 l.getAuthor(), l.getThumbsUp(), l.getThumbsDown());
     }
 

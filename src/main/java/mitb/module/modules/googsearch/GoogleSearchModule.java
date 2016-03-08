@@ -1,6 +1,8 @@
 package mitb.module.modules.googsearch;
 
 import com.google.common.base.Joiner;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -19,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Searches google for the first result.
@@ -29,6 +32,15 @@ public final class GoogleSearchModule extends CommandModule {
      * API URL.
      */
     private static final String API_URL = "https://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=";
+    /**
+     * A cache for previously evaluated expressions.
+     */
+    private static final Cache<String, String> CACHE = CacheBuilder.newBuilder().maximumSize(100)
+            .expireAfterAccess(10, TimeUnit.MINUTES).build();
+    /**
+     * An instance to convert output character entities (and other html elements) to plain ext.
+     */
+    private static final HtmlToPlainText HTML_TO_PLAIN_TXT = new HtmlToPlainText();
 
     @Override
     public String[] getCommands() {
@@ -60,11 +72,21 @@ public final class GoogleSearchModule extends CommandModule {
             return;
         }
 
-        // Constructing query and sanitizing it
-        String sanitizedQuery;
+        // Constructing query
         String[] args = entryValue.isCustomEntry() ? Arrays.copyOfRange(event.getArgs(), 1, event.getArgs().length)
                 : event.getArgs();
         String query = Joiner.on(" ").join(args);
+
+        // Check cache
+        String result = CACHE.getIfPresent(query);
+
+        if (result != null) {
+            TitanBot.sendReply(event.getSource(), result);
+            return;
+        }
+
+        // Sanitize query
+        String sanitizedQuery;
 
         try {
             sanitizedQuery = URLEncoder.encode(query, "UTF-8");
@@ -90,16 +112,14 @@ public final class GoogleSearchModule extends CommandModule {
                         List<Result> results = resp.getResponseData().getResults();
 
                         if (results.size() > finalEntryNo) {
-                            // Strip out html tags and new lines
-                            HtmlToPlainText htpt = new HtmlToPlainText();
-                            String title = htpt.getPlainText(Jsoup.parse(results.get(finalEntryNo).getTitle()));
-                            String content =StringHelper.stripNewlines(
-                                    htpt.getPlainText(Jsoup.parse(results.get(finalEntryNo).getContent())));
-                            String link = htpt.getPlainText(Jsoup.parse(results.get(finalEntryNo).getVisibleUrl()));
+                            // Result
+                            String output = formatResponse(results, finalEntryNo);
+
+                            // Update cache
+                            CACHE.put(query, output);
 
                             // Send reply
-                            TitanBot.sendReply(event.getSource(), StringHelper.wrapBold(title) + ": "
-                                    + content + " [ More at " + link + " ]");
+                            TitanBot.sendReply(event.getSource(), output);
                         } else {
                             String position = entryValue.isCustomEntry() ? " [at " + (finalEntryNo + 1) + "]" : "";
                             TitanBot.sendReply(event.getSource(), "There are no entries for: " + query + position);
@@ -112,6 +132,15 @@ public final class GoogleSearchModule extends CommandModule {
                         // XXX output error
                     }
                 });
+    }
+
+    private static final String formatResponse(List<Result> results, int entryNo) {
+        // Strip out html tags and new lines
+        String title = HTML_TO_PLAIN_TXT.getPlainText(Jsoup.parse(results.get(entryNo).getTitle()));
+        String content = StringHelper.stripNewlines(
+                HTML_TO_PLAIN_TXT.getPlainText(Jsoup.parse(results.get(entryNo).getContent())));
+        String link = HTML_TO_PLAIN_TXT.getPlainText(Jsoup.parse(results.get(entryNo).getVisibleUrl()));
+        return StringHelper.wrapBold(title) + ": " + content + " [ More at " + link + " ]";
     }
 
     @Override

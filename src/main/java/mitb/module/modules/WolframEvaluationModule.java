@@ -1,6 +1,8 @@
 package mitb.module.modules;
 
 import com.google.common.base.Joiner;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.jcabi.xml.XML;
 import com.jcabi.xml.XMLDocument;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -16,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A wolfram alpha expression evaluation module with caching. Note this caching causes issue for a small number of
@@ -32,13 +35,10 @@ public final class WolframEvaluationModule extends CommandModule {
      */
     private static final String API_KEY = Properties.getValue("wolfram.api_key");
     /**
-     * A FIFO cache for previously evaluated expressions.
+     * A cache for previously evaluated expressions.
      */
-    private static final LinkedList<WolframResult> CACHE = new LinkedList<>();
-    /**
-     * The maximum amount of elements in the cache.
-     */
-    private static final int CACHE_MAX_SIZE = Properties.getValueAsInt("wolfram.cache_size");
+    private static final Cache<String, String> CACHE = CacheBuilder.newBuilder().maximumSize(100)
+            .expireAfterAccess(10, TimeUnit.MINUTES).build();
 
     @Override
     public String[] getCommands() {
@@ -70,10 +70,10 @@ public final class WolframEvaluationModule extends CommandModule {
         String query = Joiner.on(" ").join(event.getArgs());
 
         // Check cache
-        WolframResult result = getCachedResult(query);
+        String result = CACHE.getIfPresent(query);
 
         if (result != null) {
-            TitanBot.sendReply(event.getSource(), result.toString());
+            TitanBot.sendReply(event.getSource(), result);
             return;
         }
 
@@ -103,13 +103,13 @@ public final class WolframEvaluationModule extends CommandModule {
                         // Outputting response
                         if (result != null) {
                             result = StringEscapeUtils.unescapeHtml4(result); // unescaping character entities
-                            WolframResult res = new WolframResult(query, result);
+                            String output = query + " = " + result;
 
                             // Updating cache
-                            updateCache(res);
+                            CACHE.put(query, output);
 
                             // Send response
-                            TitanBot.sendReply(event.getSource(), res.toString());
+                            TitanBot.sendReply(event.getSource(), output);
                         } else {
                             TitanBot.sendReply(event.getSource(), "No result found for: " + query);
                         }
@@ -121,22 +121,6 @@ public final class WolframEvaluationModule extends CommandModule {
                         // XXX output error
                     }
                 });
-    }
-
-    private void updateCache(WolframResult result) {
-        if (CACHE.size() == CACHE_MAX_SIZE) { // pop if necessary
-            CACHE.removeFirst();
-        }
-        CACHE.add(result);
-    }
-
-    private WolframResult getCachedResult(String query) {
-        for (WolframResult result : CACHE) {
-            if (result.getQuery().equalsIgnoreCase(query)) {
-                return result;
-            }
-        }
-        return null;
     }
 
     /**
@@ -166,33 +150,5 @@ public final class WolframEvaluationModule extends CommandModule {
     @Override
     public void register() {
 
-    }
-
-
-    /**
-     * A wolfram API result.
-     */
-    static final class WolframResult {
-
-        private String query;
-        private String result;
-
-        protected WolframResult(String query, String result) {
-            this.query = query;
-            this.result = result;
-        }
-
-        public String getResult() {
-            return result;
-        }
-
-        public String getQuery() {
-            return query;
-        }
-
-        @Override
-        public String toString() {
-            return getQuery() + " = " + getResult();
-        }
     }
 }

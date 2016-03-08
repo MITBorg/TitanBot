@@ -1,5 +1,7 @@
 package mitb.module.modules.youtube;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -18,6 +20,7 @@ import mitb.util.Properties;
 import mitb.util.StringHelper;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +42,11 @@ public final class YoutubeLookupModule extends Module {
      * This was adapted to support HTTPs links.
      */
     private static final Pattern YOUTUBE_LINK_PATTERN = Pattern.compile("https?:\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-]+)(&(amp;)?[\\w\\?=]*)?");
+    /**
+     * A cache for previously evaluated expressions.
+     */
+    private static final Cache<String, String> CACHE = CacheBuilder.newBuilder().maximumSize(100)
+            .expireAfterAccess(10, TimeUnit.MINUTES).build();
 
     @Override
     protected void register() {
@@ -64,6 +72,13 @@ public final class YoutubeLookupModule extends Module {
     }
 
     private void sendInfo(MessageEvent event, String videoId) {
+        // Check cache
+        String result = CACHE.getIfPresent(videoId);
+
+        if (result != null) {
+            TitanBot.sendReply(event.getSource(), result);
+            return;
+        }
 
         // Construct url
         String url = API_URL + videoId + "&part=snippet,statistics&key=" + GOOGLE_API_KEY;
@@ -82,10 +97,15 @@ public final class YoutubeLookupModule extends Module {
 
                         // Evaluating response
                         if (resp != null) {
-                            String msg = formatVideoDetails(resp);
+                            String output = formatVideoDetails(resp);
 
-                            if (msg != null)
-                            TitanBot.sendReply(event.getSource(), msg);
+                            if (output != null) {
+                                // Update cache
+                                CACHE.put(videoId, output);
+
+                                // Send reply
+                                TitanBot.sendReply(event.getSource(), output);
+                            }
                         }
                         return response;
                     }
