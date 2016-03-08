@@ -17,6 +17,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
 import org.pircbotx.cap.TLSCapHandler;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.WhoisEvent;
 import org.pircbotx.hooks.types.GenericEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,29 +45,52 @@ public final class TitanBot {
     public void run() throws Exception {
         databaseConnection = DriverManager.getConnection("jdbc:sqlite:database.db");
 
-        StringHelper.loadWordList(Properties.getValue("wordlist"));
+        StringHelper.loadWordList(Properties.getValue("games.wordlist"));
         EventHandler.register(new CommandHandler());
         this.registerModules();
         this.createTables();
 
-        Configuration configuration = new Configuration.Builder()
+        Configuration configuration = generateConfiguration();
+
+        // Now start the bot
+        PircBotX bot = new PircBotX(configuration);
+        bot.startBot();
+    }
+
+    /**
+     * Generates bot {@link Configuration}.
+     * @return This bots configuration based on its {@link Properties}.
+     */
+    private Configuration generateConfiguration() {
+        // Building configuration
+        Configuration.Builder configBuilder = new Configuration.Builder()
                 .setName(Properties.getValue("bot.nick"))
                 .setLogin(Properties.getValue("bot.username"))
                 .setVersion(Properties.getValue("bot.version"))
                 .setRealName(Properties.getValue("bot.real_name"))
-                .setNickservPassword(Properties.getValue("bot.password"))
                 .setSocketFactory(new UtilSSLSocketFactory().trustAllCertificates())
                 .setAutoNickChange(true)
                 .setAutoReconnect(true)
                 .setAutoSplitMessage(false)
-                .addAutoJoinChannel(Properties.getValue("irc.autojoin_channel"))
                 .addListener(new IRCListener())
                 .addCapHandler(new TLSCapHandler((SSLSocketFactory) SSLSocketFactory.getDefault(), true))
-                .addServer(Properties.getValue("irc.server"), Properties.getValueAsInt("irc.port"))
-                .buildConfiguration();
+                .addServer(Properties.getValue("irc.server"), Properties.getValueAsInt("irc.port"));
 
-        PircBotX bot = new PircBotX(configuration);
-        bot.startBot();
+        // Conditional parameters
+        String pass = Properties.getValue("bot.password");
+
+        if (!pass.equalsIgnoreCase("NONE")) {
+            configBuilder.setNickservPassword(pass);
+        }
+
+        String autojoinChannel = Properties.getValue("irc.autojoin_channel");
+
+        if (!autojoinChannel.equalsIgnoreCase("NONE")) {
+            configBuilder.addAutoJoinChannel(autojoinChannel);
+        }
+
+        // Now build and return the configuration
+        return configBuilder.buildConfiguration();
     }
 
     /**

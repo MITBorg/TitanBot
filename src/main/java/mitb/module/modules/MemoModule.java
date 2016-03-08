@@ -8,6 +8,7 @@ import mitb.event.events.CommandEvent;
 import mitb.event.events.JoinEvent;
 import mitb.module.CommandModule;
 import mitb.util.PIrcBotXHelper;
+import org.pircbotx.User;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,6 +43,20 @@ public final class MemoModule extends CommandModule {
 
         // Invalid caller/source event
         if (callerNick == null) {
+            return;
+        }
+
+        // Only identified users can use memo
+        User callerUser = PIrcBotXHelper.getUser(event.getSource());
+
+        // Invalid caller/source event
+        if (callerUser == null) {
+            return;
+        }
+
+        // Disallow access by unverified users
+        if (!callerUser.isVerified()) {
+            TitanBot.sendReply(event.getSource(), "You must be identified for your nick to use memo.");
             return;
         }
 

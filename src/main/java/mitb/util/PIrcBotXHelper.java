@@ -1,5 +1,6 @@
 package mitb.util;
 
+import org.pircbotx.User;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.types.GenericEvent;
@@ -10,16 +11,27 @@ import org.pircbotx.hooks.types.GenericEvent;
 public final class PIrcBotXHelper {
 
     /**
-     * Gets the nickname of the sender of an event in lower case, or null if invalid.
-     * @param event
-     * @return
+     * Gets the user of the sender of an {@link MessageEvent} or {@link PrivateMessageEvent}, or null if an invalid.
+     * @param event The event.
+     * @return {@link User} or null if the event type is invalid or the user object instance is null.
      */
-    public static String getNick(GenericEvent event) {
+    public static User getUser(GenericEvent event) {
         if (event instanceof PrivateMessageEvent) {
-            return ((PrivateMessageEvent)event).getUser().getNick().toLowerCase();
+            return ((PrivateMessageEvent)event).getUser();
         } else if (event instanceof MessageEvent) {
-            return ((MessageEvent)event).getUser().getNick().toLowerCase();
+            return ((MessageEvent)event).getUser();
         }
         return null; // invalid event type
+    }
+
+    /**
+     * Gets the nickname of the sender of an {@link MessageEvent} or {@link PrivateMessageEvent} in lower case,
+     * or null if invalid.
+     * @param event The event.
+     * @return {@link User} or null if the event type is invalid or the user object instance is null.
+     */
+    public static String getNick(GenericEvent event) {
+        User u = getUser(event);
+        return u == null ? null : u.getNick().toLowerCase();
     }
 }
