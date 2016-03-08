@@ -16,7 +16,13 @@ public final class FlameBotModule extends Module {
     public void onJoin(JoinEvent event) {
         org.pircbotx.hooks.events.JoinEvent evt = event.getSource();
 
-        if(!evt.getUser().getNick().equals(evt.getBot().getNick()) && evt.getUser().getNick().toLowerCase().endsWith("bot")) {
+        // Validate input
+        if (evt.getUser() == null)
+            return;
+
+        String nick = evt.getUser().getNick();
+
+        if(!nick.equalsIgnoreCase(evt.getBot().getNick()) && nick.toLowerCase().endsWith("bot")) {
             evt.respond("im better than u noob bot");
         }
     }

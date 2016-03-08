@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
+import mitb.util.PIrcBotXHelper;
 import mitb.util.StringHelper;
 import org.pircbotx.hooks.events.MessageEvent;
 
@@ -37,7 +38,14 @@ public final class QuotesModule extends CommandModule {
         if (event.getArgs().length < 1)
             return;
 
-        String callerNick = ((MessageEvent)event.getSource()).getUser().getNick().toLowerCase();
+        String callerNick = PIrcBotXHelper.getNick(event.getSource());
+
+        // Invalid caller/source event
+        if (callerNick == null) {
+            return;
+        }
+
+        // Handle commands
         String cmd = event.getArgs()[0];
 
         if (cmd.equals("add") && event.getArgs().length > 1) {

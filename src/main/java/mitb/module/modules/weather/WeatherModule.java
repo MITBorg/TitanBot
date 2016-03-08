@@ -12,6 +12,7 @@ import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.module.modules.weather.json.*;
 import mitb.util.MathHelper;
+import mitb.util.PIrcBotXHelper;
 import mitb.util.Properties;
 import mitb.util.StringHelper;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -75,15 +76,7 @@ public final class WeatherModule extends CommandModule {
 
         // TODO cache results to speed up repeat queries
         boolean useCachedLocation = false;
-        String callerNick;
-
-        if (event.getSource() instanceof PrivateMessageEvent) {
-            callerNick = ((PrivateMessageEvent)event.getSource()).getUser().getNick().toLowerCase();
-        } else if (event.getSource() instanceof MessageEvent) {
-            callerNick = ((MessageEvent)event.getSource()).getUser().getNick().toLowerCase();
-        } else {
-            return; // invalid event source type
-        }
+        String callerNick = PIrcBotXHelper.getNick(event.getSource());
 
         // Checking if we should use a cached location for the user
         if (event.getArgs().length == 0) {

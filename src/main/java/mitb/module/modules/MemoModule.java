@@ -7,8 +7,7 @@ import mitb.event.Listener;
 import mitb.event.events.CommandEvent;
 import mitb.event.events.JoinEvent;
 import mitb.module.CommandModule;
-import org.pircbotx.hooks.events.MessageEvent;
-import org.pircbotx.hooks.events.PrivateMessageEvent;
+import mitb.util.PIrcBotXHelper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,16 +34,18 @@ public final class MemoModule extends CommandModule {
 
     @Override
     public void onCommand(CommandEvent event) {
-        // Parsing command
-        String callerNick;
+        if (event.getArgs().length == 0)
+            return;
 
-        if (event.getSource() instanceof PrivateMessageEvent) {
-            callerNick = ((PrivateMessageEvent)event.getSource()).getUser().getNick().toLowerCase();
-        } else if (event.getSource() instanceof MessageEvent) {
-            callerNick = ((MessageEvent)event.getSource()).getUser().getNick().toLowerCase();
-        } else {
-            return; // invalid event source type
+        // Parsing command
+        String callerNick = PIrcBotXHelper.getNick(event.getSource());
+
+        // Invalid caller/source event
+        if (callerNick == null) {
+            return;
         }
+
+        // Handle command
         String cmd = event.getArgs()[0].toLowerCase();
 
         if (cmd.equals("add") && event.getArgs().length >= 3) { // Adding a new message
