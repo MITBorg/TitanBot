@@ -41,7 +41,8 @@ public final class YoutubeLookupModule extends Module {
      * A RegEx to parse out Youtube video links - from http://stackoverflow.com/questions/3717115/regular-expression-for-youtube-links
      * This was adapted to support HTTPs links.
      */
-    private static final Pattern YOUTUBE_LINK_PATTERN = Pattern.compile("https?:\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-]+)(&(amp;)?[\\w\\?=]*)?");
+    private static final Pattern YOUTUBE_LINK_PATTERN = Pattern.compile("https?:\\/\\/(?:www\\.)?youtu(?:be\\.com\\/watch\\?v=|\\.be\\/)([\\w\\-]+)(&(amp;)?[\\w\\?=]*)?",
+            Pattern.CASE_INSENSITIVE);
     /**
      * A cache for previously evaluated expressions.
      */
@@ -59,7 +60,6 @@ public final class YoutubeLookupModule extends Module {
         if (GOOGLE_API_KEY.equalsIgnoreCase("NONE"))
             return;
 
-        // TODO make it work for input regardless of case: note using String#toLowerCase() isnt going to achieve this!
         org.pircbotx.hooks.events.MessageEvent evt = event.getSource();
         String msg = evt.getMessage();
 
