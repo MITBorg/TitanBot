@@ -6,6 +6,7 @@ import mitb.event.Listener;
 import mitb.event.events.CommandEvent;
 import mitb.event.events.MessageEvent;
 import mitb.module.CommandModule;
+import mitb.util.Properties;
 import mitb.util.StringHelper;
 import org.pircbotx.PircBotX;
 
@@ -22,6 +23,10 @@ public final class HangmanGameModule extends CommandModule {
     // TODO kill instances in channels where we are removed (kicked/banned) from
     // TODO add rankings and a points system
     // TODO list active channels cmd?
+    /**
+     * If the games module is restricted to a channel, 'no' if not and channel name if so.
+     */
+    private static final String RESTRICTED_CHANNEL = Properties.getValue("games.restrict_channel");
     /**
      * Game sessions, each channel name gets a unique one.
      */
@@ -58,6 +63,12 @@ public final class HangmanGameModule extends CommandModule {
         if (cmd.equals("start")) { // starts a game session for a channel
             if (event.getSource().getBot().getUserChannelDao().containsChannel(channelName)) {
                 GameSession session = gameSessions.get(channelName);
+
+                // check if allowed to start
+                if (!isAllowed(channelName)) {
+                    TitanBot.sendReply(event.getSource(), "This module is restricted to " + RESTRICTED_CHANNEL);
+                    return;
+                }
 
                 if (session == null) { // no game session, start session
                     String word = StringHelper.getRandomWord();
@@ -168,7 +179,17 @@ public final class HangmanGameModule extends CommandModule {
     @Override
     public void getHelp(CommandEvent event) {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " start | " + event.getArgs()[0]
-                + " stop | " + event.getArgs()[0] + " progress | Type single letters/whole words in channel");
+                + " stop | " + event.getArgs()[0] + " progress | Type single letters/whole words in channel"
+                + (RESTRICTED_CHANNEL.equalsIgnoreCase("NO") ? "" : " | Restricted to " + RESTRICTED_CHANNEL));
+    }
+
+    /**
+     * If this module is allowed to start game sessions in the given channel.
+     * @param channelName
+     * @return
+     */
+    private boolean isAllowed(String channelName) {
+        return RESTRICTED_CHANNEL.equalsIgnoreCase("NO") || RESTRICTED_CHANNEL.equalsIgnoreCase(channelName);
     }
 
     /**

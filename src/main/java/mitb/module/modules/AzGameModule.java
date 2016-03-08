@@ -6,6 +6,7 @@ import mitb.event.Listener;
 import mitb.event.events.CommandEvent;
 import mitb.event.events.MessageEvent;
 import mitb.module.CommandModule;
+import mitb.util.Properties;
 import mitb.util.StringHelper;
 import org.pircbotx.PircBotX;
 
@@ -21,6 +22,10 @@ public final class AzGameModule extends CommandModule {
     // TODO kill instances in channels where we are removed (kicked/banned) from
     // TODO add rankings and a points system
     // TODO list active channels cmd?
+    /**
+     * If the games module is restricted to a channel, 'no' if not and channel name if so.
+     */
+    private static final String RESTRICTED_CHANNEL = Properties.getValue("games.restrict_channel");
     /**
      * Game sessions, each channel name gets a unique one.
      */
@@ -38,7 +43,8 @@ public final class AzGameModule extends CommandModule {
     @Override
     public void getHelp(CommandEvent event) {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " start | " + event.getArgs()[0]
-                + " stop | " + event.getArgs()[0] + " range | Type single words in channel");
+                + " stop | " + event.getArgs()[0] + " range | Type single words in channel"
+                + (RESTRICTED_CHANNEL.equalsIgnoreCase("NO") ? "" : " | Restricted to " + RESTRICTED_CHANNEL));
     }
 
     /**
@@ -73,6 +79,13 @@ public final class AzGameModule extends CommandModule {
                 GameSession session = gameSessions.get(channelName);
 
                 if (session == null) { // no game session, start session
+                    // check if allowed to run
+                    if (!isAllowed(channelName)) {
+                        TitanBot.sendReply(event.getSource(), "This module is restricted to " + RESTRICTED_CHANNEL);
+                        return;
+                    }
+
+                    // regular game session create logic
                     String word = getRandomWord();
                     gameSessions.put(channelName, new GameSession(word));
                     sendUpdate(event.getSource().getBot(), channelName);
@@ -89,6 +102,8 @@ public final class AzGameModule extends CommandModule {
             if (session != null) {
                 gameSessions.remove(channelName);
                 TitanBot.sendReply(event.getSource(), "Game session ended, the word was: " + session.getWord());
+            } else {
+                TitanBot.sendReply(event.getSource(), "No game session to end in " + channelName);
             }
         } else if (cmd.equals("range")) { // displays the word range for a channel
             GameSession session = gameSessions.get(channelName);
@@ -99,6 +114,15 @@ public final class AzGameModule extends CommandModule {
                 sendUpdate(event.getSource().getBot(), channelName);
             }
         }
+    }
+
+    /**
+     * If this module is allowed to start game sessions in the given channel.
+     * @param channelName
+     * @return
+     */
+    private boolean isAllowed(String channelName) {
+        return RESTRICTED_CHANNEL.equalsIgnoreCase("NO") || RESTRICTED_CHANNEL.equalsIgnoreCase(channelName);
     }
 
     @Listener
