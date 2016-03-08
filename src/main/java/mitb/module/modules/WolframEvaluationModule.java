@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -39,6 +38,14 @@ public final class WolframEvaluationModule extends CommandModule {
      */
     private static final Cache<String, String> CACHE = CacheBuilder.newBuilder().maximumSize(100)
             .expireAfterAccess(10, TimeUnit.MINUTES).build();
+    /**
+     * XPath matching for results in API output generated from RESULT_POD_TITLES.
+     */
+    private static String XPATH_RESULT_TITLES;
+    /**
+     * A list of matched result pod titles.
+     */
+    private static String[] RESULT_POD_TITLES = new String[] { "Result", "Exact result", "Limit", "Derivative", "Indefinite integral", "Definite integral" };
 
     @Override
     public String[] getCommands() {
@@ -131,24 +138,22 @@ public final class WolframEvaluationModule extends CommandModule {
     private String parseResult(String content) {
         XML xml = new XMLDocument(content);
 
-        // Exact result response
-        List exactResults = xml.xpath("/queryresult/pod[@title='Exact result']/subpod/plaintext/text()");
-
-        if (exactResults.size() > 0) {
-            return exactResults.get(0).toString();
-        }
-
-        // Result response
-        List results = xml.xpath("/queryresult/pod[@title='Result']/subpod/plaintext/text()");
-
-        if (results.size() > 0) {
-            return results.get(0).toString();
-        }
-        return null; // Fall-back no result found
+        // Global response capturing
+        List results = xml.xpath("/queryresult[@success='true']/pod[" + XPATH_RESULT_TITLES + "]/subpod/plaintext/text()");
+        return results.size() >= 0 ? results.get(0).toString() : null; // Fall-back no result found
     }
 
     @Override
     public void register() {
+        // Generate result titles for xpath capturing
+        XPATH_RESULT_TITLES = "";
 
+        for (int i = 0; i < RESULT_POD_TITLES.length; i++) {
+            String title = RESULT_POD_TITLES[i];
+            XPATH_RESULT_TITLES += "@title='" + title + "'";
+
+            if (i + 1 < RESULT_POD_TITLES.length)
+                XPATH_RESULT_TITLES += " or ";
+        }
     }
 }
