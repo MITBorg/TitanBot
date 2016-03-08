@@ -101,8 +101,9 @@ public final class HangmanGameModule extends CommandModule {
 
     private void sendUpdate(PircBotX bot, String channelName) {
         GameSession session = gameSessions.get(channelName);
-        bot.sendRaw().rawLine("PRIVMSG " + channelName + " :[Hangman Update] Word: " + session.getGuessWord() + " | Lives: "
-                + session.getLives() + " | Used Letters: " + session.getGuessedLetters()); // XXX refactor this garbage
+        String state = "[Hangman Update] Word: " + session.getGuessWord() + " | Lives: " + session.getLives()
+                + " | Used Letters: " + session.getGuessedLetters();
+        bot.send().message(channelName, state);
     }
     @Listener
     public void onMessage(MessageEvent event) {

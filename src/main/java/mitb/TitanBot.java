@@ -132,22 +132,22 @@ public final class TitanBot {
                     // if the next string with length maxLength doesn't contain ' '
                     if (spaceToWrapAt < offset) {
                         spaceToWrapAt = reply.indexOf(' ', wrapLength + offset);
+
                         // if no more ' '
                         if (spaceToWrapAt < 0) {
                             break;
                         }
                     }
-
                     resultBuilder.add(reply.substring(offset, spaceToWrapAt));
                     offset = spaceToWrapAt + 1;
                 }
 
                 resultBuilder.add(reply.substring(offset));
+
                 if (resultBuilder.size() > 2) {
                     if (resultBuilder.size() > 3) {
                         resultBuilder.set(2, resultBuilder.get(2).substring(0, resultBuilder.get(2).length() - truncatedText.length()) + truncatedText);
                     }
-
                     resultBuilder = resultBuilder.subList(0, 3);
                 }
                 resultBuilder.forEach((s) -> event.getBot().sendRaw().rawLine(prefix + s));
@@ -161,7 +161,7 @@ public final class TitanBot {
      * Registers all the modules of the application.
      */
     private void registerModules() {
-        MODULES.add(new TestCommandModule());
+        // MODULES.add(new TestCommandModule()); // test module - demonstrates how to add your own
         MODULES.add(new LastSeenModule());
         MODULES.add(new StatsModule());
         MODULES.add(new UrbanDictionaryModule());

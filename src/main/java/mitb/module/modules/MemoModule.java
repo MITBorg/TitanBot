@@ -30,7 +30,8 @@ public final class MemoModule extends CommandModule {
     @Override
     public void getHelp(CommandEvent event) {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " add (target_nick) (msg) | "
-                + event.getArgs()[0] + " view (sender_nick) | pending");
+                + event.getArgs()[0] + " view (sender_nick) | "  + event.getArgs()[0]
+                + " pending | Note: You must be using a verified IRC nickname to use this module.");
     }
 
     @Override
@@ -68,15 +69,21 @@ public final class MemoModule extends CommandModule {
         } else if (cmd.equals("view") && event.getArgs().length >= 2) { // Viewing a message
             viewMessage(event, callerNick);
         } else if (cmd.equals("pending")) { // Seeing pending messages
-            // Sending joined users a list of their pending memos
-            String msg = getPendingMessageSenders(getMessageSenders(callerNick));
-
-            if (msg != null) {
-                event.getSource().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :There are memos for you from: " + msg);
-            } else {
-                event.getSource().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :There are no memos for you.");
-            }
+            sendPending(event, callerNick);
         }
+    }
+
+    /**
+     * Sends a list of users who have pending memos for the caller.
+     * @param event
+     * @param callerNick
+     */
+    private void sendPending(CommandEvent event, String callerNick) {
+        String msg = getPendingMessageSenders(getMessageSenders(callerNick));
+
+        // Reply
+        String output = msg == null ? "There are no memos for you." : "There are memo for you from: " + msg;
+        TitanBot.sendReply(event.getSource(), output);
     }
 
     /**
@@ -86,11 +93,11 @@ public final class MemoModule extends CommandModule {
      */
     private void viewMessage(CommandEvent event, String callerNick) {
         String senderNick = event.getArgs()[1].toLowerCase();
-        String msg = getMessage(senderNick, callerNick);
+        String memoMessage = getMessage(senderNick, callerNick);
 
         // Attempting to view message
-        if (msg != null) {
-            event.getSource().getBot().sendRaw().rawLine("PRIVMSG " + callerNick + " :[" + senderNick + "] " + msg); // XXX make this pretty
+        if (memoMessage != null) {
+            TitanBot.sendReply(event.getSource(), "[" + senderNick + "] " + memoMessage);
             deleteMessage(senderNick, callerNick);
         } else {
             TitanBot.sendReply(event.getSource(), "There is no message for you from: " + senderNick);
@@ -111,8 +118,14 @@ public final class MemoModule extends CommandModule {
             msg = msg.substring(0, 250 - 1 - 3) + "...";
 
         // Adding/updating message
-        if (!targetNick.equals(callerNick) && ! targetNick.equalsIgnoreCase(event.getSource().getBot().getNick())) {
+        if (!targetNick.equals(callerNick) && !targetNick.equalsIgnoreCase(event.getSource().getBot().getNick())) {
+            // Add message to database
             updateMessage(callerNick, targetNick, msg);
+
+            // Try to inform target, if they are online
+            event.getSource().getBot().send().message(targetNick, "There is a new memo for you from: " + callerNick);
+
+            // Reply
             TitanBot.sendReply(event.getSource(), "Your message to " + targetNick + " was recorded.");
         } else {
             TitanBot.sendReply(event.getSource(), "You cant queue a message to yourself/the bot!");
@@ -130,11 +143,11 @@ public final class MemoModule extends CommandModule {
 
         // Sending joined users a list of their pending memos
         if (!evt.getUser().getNick().equals(evt.getBot().getNick())) {
-            String msg = getPendingMessageSenders(getMessageSenders(targetNick));
+            String pendingMessageSenders = getPendingMessageSenders(getMessageSenders(targetNick));
 
             // Send message if memos are available
-            if (msg != null) {
-                evt.getBot().sendRaw().rawLine("PRIVMSG " + targetNick + " :There are memos for you from: " + msg);
+            if (pendingMessageSenders != null) {
+                evt.getBot().send().message(targetNick, "There are memos for you from: " + pendingMessageSenders);
             }
         }
     }

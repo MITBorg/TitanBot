@@ -169,8 +169,8 @@ public final class AzGameModule extends CommandModule {
 
     private void sendUpdate(PircBotX bot, String channelName) {
         GameSession session = gameSessions.get(channelName);
-        bot.sendRaw().rawLine("PRIVMSG " + channelName + " :A-Z update: " + session.getLowerBoundWord() + "-"
-                + session.getUpperBoundWord()); // XXX refactor this garbage
+        String state = "[A-Z Update] " + session.getLowerBoundWord() + "-" + session.getUpperBoundWord();
+        bot.send().message(channelName, state);
     }
 
     /**
