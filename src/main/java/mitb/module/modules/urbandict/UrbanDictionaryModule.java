@@ -90,9 +90,9 @@ public final class UrbanDictionaryModule extends CommandModule {
         }
 
         // Sanitize query
-        try {
-            sanitizedQuery = URLEncoder.encode(query, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        sanitizedQuery = StringHelper.urlEncode(query);
+
+        if (sanitizedQuery == null) {
             TitanBot.sendReply(event.getSource(), "Error encoding query for urban dictionary.");
             return;
         }
@@ -169,7 +169,7 @@ public final class UrbanDictionaryModule extends CommandModule {
         if (def.length() > 200) {
             def = def.substring(0, 200 - 3) + "...";
         }
-        def = StringHelper.stripNewlines(def);
+        def = StringHelper.stripNewlines(def) + " [ more at " + l.getPermalink() + " ]";
 
         // Return formatted output
         return String.format("%s: %s [by %s +%d/-%d]",

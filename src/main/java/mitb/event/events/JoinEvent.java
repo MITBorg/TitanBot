@@ -9,8 +9,8 @@ import mitb.event.ProxyEvent;
 public final class JoinEvent implements Event, ProxyEvent {
     private org.pircbotx.hooks.events.JoinEvent event = null;
 
-    public JoinEvent(org.pircbotx.hooks.events.JoinEvent originalEvent) {
-        this.event = originalEvent;
+    public JoinEvent(org.pircbotx.hooks.events.JoinEvent sourceEvent) {
+        this.event = sourceEvent;
     }
 
     public org.pircbotx.hooks.events.JoinEvent getSource() {

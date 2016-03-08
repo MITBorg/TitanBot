@@ -12,10 +12,9 @@ import mitb.TitanBot;
 import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.util.Properties;
+import mitb.util.StringHelper;
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +44,26 @@ public final class WolframEvaluationModule extends CommandModule {
     /**
      * A list of matched result pod titles.
      */
-    private static String[] RESULT_POD_TITLES = new String[] { "Result", "Exact result", "Limit", "Derivative", "Indefinite integral", "Definite integral" };
+    private static String[] RESULT_POD_TITLES = new String[]{"Result", "Exact result", "Limit", "Derivative", "Indefinite integral", "Definite integral"};
+
+    static {
+        generateXPathCaptureGroup();
+    }
+
+    /**
+     * Generates results for x-path capturing.
+     */
+    private static void generateXPathCaptureGroup() {
+        XPATH_RESULT_TITLES = "";
+
+        for (int i = 0; i < RESULT_POD_TITLES.length; i++) {
+            String title = RESULT_POD_TITLES[i];
+            XPATH_RESULT_TITLES += "@title='" + title + "'";
+
+            if (i + 1 < RESULT_POD_TITLES.length)
+                XPATH_RESULT_TITLES += " or ";
+        }
+    }
 
     @Override
     public String[] getCommands() {
@@ -85,11 +103,9 @@ public final class WolframEvaluationModule extends CommandModule {
         }
 
         // Continue constructing query
-        String sanitizedQuery;
+        String sanitizedQuery = StringHelper.urlEncode(query);
 
-        try {
-            sanitizedQuery = URLEncoder.encode(query, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        if (sanitizedQuery == null) {
             TitanBot.sendReply(event.getSource(), "Error encoding query for wolfram.");
             return;
         }
@@ -132,6 +148,7 @@ public final class WolframEvaluationModule extends CommandModule {
 
     /**
      * Parses the result out of the given wolfram alpha api response.
+     *
      * @param content
      * @return Result (in plaintext) or null if not found.
      */
@@ -145,15 +162,6 @@ public final class WolframEvaluationModule extends CommandModule {
 
     @Override
     public void register() {
-        // Generate result titles for xpath capturing
-        XPATH_RESULT_TITLES = "";
 
-        for (int i = 0; i < RESULT_POD_TITLES.length; i++) {
-            String title = RESULT_POD_TITLES[i];
-            XPATH_RESULT_TITLES += "@title='" + title + "'";
-
-            if (i + 1 < RESULT_POD_TITLES.length)
-                XPATH_RESULT_TITLES += " or ";
-        }
     }
 }

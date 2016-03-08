@@ -6,6 +6,7 @@ import mitb.event.Listener;
 import mitb.event.events.CommandEvent;
 import mitb.event.events.MessageEvent;
 import mitb.module.CommandModule;
+import mitb.util.PIrcBotXHelper;
 import mitb.util.Properties;
 import mitb.util.StringHelper;
 import org.pircbotx.PircBotX;
@@ -65,54 +66,60 @@ public final class AzGameModule extends CommandModule {
 
         // Parse command
         String cmd = event.getArgs()[0];
-        String channelName;
+        String channelName = PIrcBotXHelper.getChannelName(event.getSource());
 
-        if (event.getSource() instanceof org.pircbotx.hooks.events.MessageEvent) {
-            channelName = ((org.pircbotx.hooks.events.MessageEvent)event.getSource()).getChannelSource();
-        } else {
-            return; // private message to bot, so we ignore it
-        }
+        // Ignore non-channel messages
+        if (channelName == null)
+            return;
 
         // Process command
+        GameSession session = gameSessions.get(channelName);
+
         if (cmd.equals("start")) { // starts a game session for a channel
-            if (event.getSource().getBot().getUserChannelDao().containsChannel(channelName)) {
-                GameSession session = gameSessions.get(channelName);
-
-                if (session == null) { // no game session, start session
-                    // check if allowed to run
-                    if (!isAllowed(channelName)) {
-                        TitanBot.sendReply(event.getSource(), "This module is restricted to " + RESTRICTED_CHANNEL);
-                        return;
-                    }
-
-                    // regular game session create logic
-                    String word = getRandomWord();
-                    gameSessions.put(channelName, new GameSession(word));
-                    sendUpdate(event.getSource().getBot(), channelName);
-                    TitanBot.LOGGER.info("A-Z instance started for " + channelName + " with solution: " + word);
-                } else { // game in progress, nothing to do
-                    TitanBot.sendReply(event.getSource(), "A game session for this channel already exists, try checking the progress.");
-                }
-            } else {
-                TitanBot.sendReply(event.getSource(), "I am not in that channel and so cannot create a game session for it.");
-            }
+            startSession(channelName, session, event);
         } else if (cmd.equals("stop")) { // stops a game session for a channel
-            GameSession session = gameSessions.get(channelName);
-
-            if (session != null) {
-                gameSessions.remove(channelName);
-                TitanBot.sendReply(event.getSource(), "Game session ended, the word was: " + session.getWord());
-            } else {
-                TitanBot.sendReply(event.getSource(), "No game session to end in " + channelName);
-            }
+            stopSession(channelName, session, event);
         } else if (cmd.equals("range")) { // displays the word range for a channel
-            GameSession session = gameSessions.get(channelName);
+            updateRange(channelName, session, event);
+        }
+    }
 
-            if (session == null) { // not existent
-                TitanBot.sendReply(event.getSource(), "No game session in progress for this channel. Try creating one.");
-            } else { // game in progress
+    private void startSession(String channelName, GameSession session, CommandEvent event) {
+        if (event.getSource().getBot().getUserChannelDao().containsChannel(channelName)) {
+            if (session == null) { // no game session, start session
+                // check if allowed to run
+                if (!isAllowed(channelName)) {
+                    TitanBot.sendReply(event.getSource(), "This module is restricted to " + RESTRICTED_CHANNEL);
+                    return;
+                }
+
+                // regular game session create logic
+                String word = getRandomWord();
+                gameSessions.put(channelName, new GameSession(word));
                 sendUpdate(event.getSource().getBot(), channelName);
+                TitanBot.getLogger().info("A-Z instance started for " + channelName + " with solution: " + word);
+            } else { // game in progress, nothing to do
+                TitanBot.sendReply(event.getSource(), "A game session for this channel already exists, try checking the progress.");
             }
+        } else {
+            TitanBot.sendReply(event.getSource(), "I am not in that channel and so cannot create a game session for it.");
+        }
+    }
+
+    private void updateRange(String channelName, GameSession session, CommandEvent event) {
+        if (session == null) { // not existent
+            TitanBot.sendReply(event.getSource(), "No game session in progress for this channel. Try creating one.");
+        } else { // game in progress
+            sendUpdate(event.getSource().getBot(), channelName);
+        }
+    }
+
+    private void stopSession(String channelName, GameSession session, CommandEvent event) {
+        if (session != null) {
+            gameSessions.remove(channelName);
+            TitanBot.sendReply(event.getSource(), "Game session ended, the word was: " + session.getWord());
+        } else {
+            TitanBot.sendReply(event.getSource(), "No game session to end in " + channelName);
         }
     }
 

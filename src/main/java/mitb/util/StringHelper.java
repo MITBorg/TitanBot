@@ -1,11 +1,11 @@
 package mitb.util;
 
 import mitb.TitanBot;
-import mitb.module.modules.AzGameModule;
-import mitb.module.modules.HangmanGameModule;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -86,7 +86,7 @@ public final class StringHelper {
                 int count = Integer.parseInt(header.split("=")[1]);
 
                 if (count < 4) { // Invalid length - word list not loaded
-                    TitanBot.LOGGER.error("Invalid word-list file, need more than three entries.");
+                    TitanBot.getLogger().error("Invalid word-list file, need more than three entries.");
                     return;
                 }
                 wordList = new String[count];
@@ -109,7 +109,7 @@ public final class StringHelper {
             wordList[wordList.length - 1] = br.readLine();
             wordListLoaded = true;
         } catch (Exception e) {
-            TitanBot.LOGGER.error("Error reading from word-list file.");
+            TitanBot.getLogger().error("Error reading from word-list file.");
         }
     }
 
@@ -136,5 +136,28 @@ public final class StringHelper {
      */
     public static String getRandomWord() {
         return wordList[RANDOM.nextInt(wordList.length)];
+    }
+
+    /**
+     * Gets the given input encoded for urls with UTF-8 encoding.
+     * @param input
+     * @return Encoded string or null if unsupported encoder set.
+     */
+    public static String urlEncode(String input) {
+        return urlEncode(input, "UTF-8");
+    }
+
+    /**
+     * Url encodes the given string.
+     * @param input
+     * @param encoding
+     * @return Encoded string or null if unsupported encoder set.
+     */
+    public static String urlEncode(String input, String encoding) {
+        try {
+            return URLEncoder.encode(input, encoding);
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
     }
 }

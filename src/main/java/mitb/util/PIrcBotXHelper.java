@@ -34,4 +34,16 @@ public final class PIrcBotXHelper {
         User u = getUser(event);
         return u == null ? null : u.getNick().toLowerCase();
     }
+
+    /**
+     * Gets the channel name of an {@link MessageEvent} or or null if invalid.
+     * @param event The event.
+     * @return Channel name or null if the event type is invalid
+     */
+    public static String getChannelName(GenericEvent event) {
+        if (event instanceof org.pircbotx.hooks.events.MessageEvent) {
+            return ((org.pircbotx.hooks.events.MessageEvent)event).getChannelSource();
+        }
+        return null; // invalid event type
+    }
 }

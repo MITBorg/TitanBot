@@ -6,7 +6,6 @@ import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.util.PIrcBotXHelper;
 import mitb.util.StringHelper;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -101,7 +100,7 @@ public final class QuotesModule extends CommandModule {
      */
     private String fetchQuote(int quoteId) {
         try {
-            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "SELECT creator_nick, quote FROM quotes WHERE id = ?"
             );
             statement.setInt(1, quoteId);
@@ -119,7 +118,7 @@ public final class QuotesModule extends CommandModule {
      */
     private void insertQuote(String creatorNick, String quote) {
         try {
-            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "INSERT INTO quotes (id, creator_nick, quote) VALUES (NULL, ?, ?)"
             );
             statement.setString(1, creatorNick);

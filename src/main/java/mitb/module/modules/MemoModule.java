@@ -39,19 +39,18 @@ public final class MemoModule extends CommandModule {
         if (event.getArgs().length == 0)
             return;
 
-        // Parsing command
-        String callerNick = PIrcBotXHelper.getNick(event.getSource());
-
-        // Invalid caller/source event
-        if (callerNick == null) {
-            return;
-        }
-
-        // Only identified users can use memo
         User callerUser = PIrcBotXHelper.getUser(event.getSource());
 
         // Invalid caller/source event
         if (callerUser == null) {
+            return;
+        }
+
+        // Parsing command
+        String callerNick = callerUser.getNick();
+
+        // Invalid caller/source event
+        if (callerNick == null) {
             return;
         }
 
@@ -69,7 +68,7 @@ public final class MemoModule extends CommandModule {
         } else if (cmd.equals("view") && event.getArgs().length >= 2) { // Viewing a message
             viewMessage(event, callerNick);
         } else if (cmd.equals("pending")) { // Seeing pending messages
-            sendPending(event, callerNick);
+            viewPending(event, callerNick);
         }
     }
 
@@ -78,7 +77,7 @@ public final class MemoModule extends CommandModule {
      * @param event
      * @param callerNick
      */
-    private void sendPending(CommandEvent event, String callerNick) {
+    private void viewPending(CommandEvent event, String callerNick) {
         String msg = getPendingMessageSenders(getMessageSenders(callerNick));
 
         // Reply
@@ -182,7 +181,7 @@ public final class MemoModule extends CommandModule {
      */
     private void updateMessage(String fromNick, String targetNick, String message) {
         try {
-            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "INSERT OR REPLACE INTO memo (id, target_nick, sender_nick, message) VALUES ((SELECT id FROM memo WHERE target_nick = ? AND sender_nick = ?), ?, ?, ?)"
             );
             statement.setString(1, targetNick);
@@ -203,7 +202,7 @@ public final class MemoModule extends CommandModule {
      */
     private void deleteMessage(String senderNick, String targetNick) {
         try {
-            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "DELETE FROM memo WHERE target_nick = ? AND sender_nick = ?"
             );
             statement.setString(1, targetNick);
@@ -222,7 +221,7 @@ public final class MemoModule extends CommandModule {
      */
     private String getMessage(String senderNick, String targetNick) {
         try {
-            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "SELECT message FROM memo WHERE sender_nick = ? AND target_nick = ?"
             );
             statement.setString(1, senderNick);
@@ -242,7 +241,7 @@ public final class MemoModule extends CommandModule {
         try {
             List<String> l = new ArrayList<>();
 
-            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "SELECT sender_nick FROM memo WHERE target_nick = ?"
             );
             statement.setString(1, targetNick);

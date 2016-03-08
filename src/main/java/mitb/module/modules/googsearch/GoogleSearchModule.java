@@ -86,11 +86,9 @@ public final class GoogleSearchModule extends CommandModule {
         }
 
         // Sanitize query
-        String sanitizedQuery;
+        String sanitizedQuery = StringHelper.urlEncode(query);
 
-        try {
-            sanitizedQuery = URLEncoder.encode(query, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        if (sanitizedQuery == null) {
             TitanBot.sendReply(event.getSource(), "Error encoding query for google search.");
             return;
         }

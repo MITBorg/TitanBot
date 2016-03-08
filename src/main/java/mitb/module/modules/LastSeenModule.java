@@ -35,15 +35,14 @@ public final class LastSeenModule extends CommandModule {
      */
     @Override
     public void onCommand(CommandEvent commandEvent) {
-        if (commandEvent.getArgs().length == 0) {
+        if (commandEvent.getArgs().length == 0)
             return;
-        }
 
         // Preparing and responding using query
         String nick = Joiner.on(" ").join(commandEvent.getArgs());
 
         try {
-            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "SELECT seen FROM seen WHERE nick LIKE ?"
             );
             statement.setString(1, nick);
@@ -71,7 +70,7 @@ public final class LastSeenModule extends CommandModule {
     @Listener
     public void onChatter(MessageEvent event) {
         try {
-            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "INSERT OR REPLACE INTO seen (id, nick, login, seen) VALUES ((SELECT id FROM seen WHERE login = ?), ?, ?, datetime())"
             );
             statement.setString(1, event.getSource().getUser().getLogin());

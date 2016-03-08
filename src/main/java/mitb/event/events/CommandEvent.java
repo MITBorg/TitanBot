@@ -14,9 +14,9 @@ public final class CommandEvent implements Event, ProxyEvent {
     private final String msg;
     private final GenericMessageEvent event;
 
-    public CommandEvent(String msg, GenericMessageEvent event) {
+    public CommandEvent(String msg, GenericMessageEvent sourceEvent) {
         this.msg = msg;
-        this.event = event;
+        this.event = sourceEvent;
     }
 
     /**
@@ -25,7 +25,8 @@ public final class CommandEvent implements Event, ProxyEvent {
      * @return command sent by the user
      */
     public String getCommand() {
-        return msg.split(" ")[0];
+        int spaceIdx = msg.indexOf(" ");
+        return spaceIdx == -1 ? msg : msg.substring(0, spaceIdx);
     }
 
     /**

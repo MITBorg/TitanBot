@@ -15,8 +15,6 @@ import mitb.util.MathHelper;
 import mitb.util.PIrcBotXHelper;
 import mitb.util.Properties;
 import mitb.util.StringHelper;
-import org.pircbotx.hooks.events.MessageEvent;
-import org.pircbotx.hooks.events.PrivateMessageEvent;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -102,9 +100,9 @@ public final class WeatherModule extends CommandModule {
         }
 
         // Sanitize query
-        try {
-            sanitizedLocation = URLEncoder.encode(location, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        sanitizedLocation = StringHelper.urlEncode(location);
+
+        if (sanitizedLocation == null) {
             TitanBot.sendReply(event.getSource(), "Error encoding query for weather.");
             return;
         }
@@ -163,7 +161,7 @@ public final class WeatherModule extends CommandModule {
      */
     private void updateCachedLocation(String nick, String location) {
         try {
-            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "INSERT OR REPLACE INTO weather (id, nick, location) VALUES ((SELECT id FROM weather WHERE nick = ?), ?, ?)"
             );
             statement.setString(1, nick);
@@ -181,7 +179,7 @@ public final class WeatherModule extends CommandModule {
      */
     private String fetchCachedLocation(String nick) {
         try {
-            PreparedStatement statement = TitanBot.databaseConnection.prepareStatement(
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "SELECT location FROM weather WHERE nick = ?"
             );
             statement.setString(1, nick);

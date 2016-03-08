@@ -9,8 +9,8 @@ import mitb.event.ProxyEvent;
 public final class PrivateMessageEvent implements Event, ProxyEvent {
     private org.pircbotx.hooks.events.PrivateMessageEvent event = null;
 
-    public PrivateMessageEvent(org.pircbotx.hooks.events.PrivateMessageEvent originalEvent) {
-        this.event = originalEvent;
+    public PrivateMessageEvent(org.pircbotx.hooks.events.PrivateMessageEvent sourceEvent) {
+        this.event = sourceEvent;
     }
 
     public org.pircbotx.hooks.events.PrivateMessageEvent getSource() {
