@@ -2,6 +2,7 @@ bot.nick=TitanBot
 bot.version=1.0.0
 bot.real_name=TitanBot
 bot.username=TitanBot
+bot.password=test123
 irc.server=irc.server.com
 irc.port=6697
 irc.autojoin_channel=#test
