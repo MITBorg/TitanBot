@@ -54,6 +54,7 @@ public final class TitanBot {
                 .setLogin(Properties.getValue("bot.username"))
                 .setVersion(Properties.getValue("bot.version"))
                 .setRealName(Properties.getValue("bot.real_name"))
+                .setNickservPassword(Properties.getValue("bot.password"))
                 .setSocketFactory(new UtilSSLSocketFactory().trustAllCertificates())
                 .setAutoNickChange(true)
                 .setAutoReconnect(true)
