@@ -216,7 +216,8 @@ public final class WeatherModule extends CommandModule {
                 .append(", Description: ").append(StringHelper.wrapBold(w.getDescription())).append(" | ");
 
         // Weather conditions
-        sb.append("Conditions: Wind Speed: ").append(StringHelper.wrapBold(query.getWind().getSpeed() + "m/s"))
+        double windSpeedMph = MathHelper.round2dp(MathHelper.msToMph(query.getWind().getSpeed()));
+        sb.append("Conditions: Wind Speed: ").append(StringHelper.wrapBold(windSpeedMph + "mph"))
                 .append(", Humidity: ").append(StringHelper.wrapBold(query.getMain().getHumidity() + "%"))
                 .append(" | ");
 
