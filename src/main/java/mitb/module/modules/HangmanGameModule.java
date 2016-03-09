@@ -31,7 +31,7 @@ public final class HangmanGameModule extends CommandModule {
     /**
      * Game sessions, each channel name gets a unique one.
      */
-    private final HashMap<String, GameSession> gameSessions = new HashMap<>();
+    private final HashMap<String, HangmanGameModule.GameSession> gameSessions = new HashMap<>();
 
     @Override
     public String[] getCommands() {
@@ -58,29 +58,30 @@ public final class HangmanGameModule extends CommandModule {
             return;
 
         // Process command
-        GameSession session = gameSessions.get(channelName);
+        HangmanGameModule.GameSession session = this.gameSessions.get(channelName);
 
         if (cmd.equals("start")) { // starts a game session for a channel
-            startSession(channelName, session, event);
+            this.startSession(channelName, session, event);
         } else if (cmd.equals("stop")) { // stops a game session for a channel
-            stopSession(channelName, session, event);
+            this.stopSession(channelName, session, event);
         } else if (cmd.equals("progress")) { // displays the progress for a channel
-            updateProgress(channelName, session, event);
+            this.updateProgress(channelName, session, event);
         }
     }
 
-    private void startSession(String channelName, GameSession session, CommandEvent event) {
+    private void startSession(String channelName, HangmanGameModule.GameSession session, CommandEvent event) {
         if (event.getSource().getBot().getUserChannelDao().containsChannel(channelName)) {
             // check if allowed to start
-            if (!isAllowed(channelName)) {
-                TitanBot.sendReply(event.getSource(), "This module is restricted to " + RESTRICTED_CHANNEL);
+            if (!HangmanGameModule.isAllowed(channelName)) {
+                TitanBot.sendReply(event.getSource(), "This module is restricted to " + HangmanGameModule
+                        .RESTRICTED_CHANNEL);
                 return;
             }
 
             if (session == null) { // no game session, start session
                 String word = StringHelper.getRandomWord();
-                gameSessions.put(channelName, new GameSession(word));
-                sendUpdate(event.getSource().getBot(), channelName);
+                this.gameSessions.put(channelName, new HangmanGameModule.GameSession(word));
+                this.sendUpdate(event.getSource().getBot(), channelName);
                 TitanBot.getLogger().info("Hangman instance started for " + channelName + " with solution: " + word);
             } else { // game in progress, nothing to do
                 TitanBot.sendReply(event.getSource(), "A game session for this channel already exists, try checking the progress.");
@@ -90,49 +91,52 @@ public final class HangmanGameModule extends CommandModule {
         }
     }
 
-    private void stopSession(String channelName, GameSession session, CommandEvent event) {
+    private void stopSession(String channelName, HangmanGameModule.GameSession session, CommandEvent event) {
         // Check if there is a session to stop
-        if (session == null)
+        if (session == null) {
             return;
+        }
 
         // Stop session
-        gameSessions.remove(channelName);
+        this.gameSessions.remove(channelName);
         TitanBot.sendReply(event.getSource(), "Game session ended, the word was: " + session.getWord());
     }
 
-    private void updateProgress(String channelName, GameSession session, CommandEvent event) {
+    private void updateProgress(String channelName, HangmanGameModule.GameSession session, CommandEvent event) {
         if (session == null) { // non-existent
             TitanBot.sendReply(event.getSource(), "No game session in progress for this channel. Try creating one.");
         } else { // game in progress
-            sendUpdate(event.getSource().getBot(), channelName);
+            this.sendUpdate(event.getSource().getBot(), channelName);
         }
     }
 
     private void sendUpdate(PircBotX bot, String channelName) {
-        GameSession session = gameSessions.get(channelName);
+        HangmanGameModule.GameSession session = this.gameSessions.get(channelName);
         String state = "[Hangman Update] Word: " + session.getGuessWord() + " | Lives: " + session.getLives()
                 + " | Used Letters: " + session.getGuessedLetters();
         bot.send().message(channelName, state);
     }
     @Listener
     public void onMessage(MessageEvent event) {
-        if (gameSessions.size() == 0)
+        if (this.gameSessions.isEmpty())
             return;
 
         // Check if this channel has a game session
         String channelName = event.getSource().getChannel().getName();
 
-        if (!gameSessions.containsKey(channelName))
+        if (!this.gameSessions.containsKey(channelName)) {
             return;
+        }
 
         // Process message
-        GameSession session = gameSessions.get(channelName);
+        HangmanGameModule.GameSession session = this.gameSessions.get(channelName);
 
         String word = event.getSource().getMessage();
 
         // Skip unrelated messages
-        if (word.contains(" "))
+        if (word.contains(" ")) {
             return;
+        }
 
         // Lowercase case guess
         word = word.toLowerCase();
@@ -143,17 +147,17 @@ public final class HangmanGameModule extends CommandModule {
             if (session.getWord().equals(word)) {
                 TitanBot.sendReply(event.getSource(), "This game was won by "
                         + event.getSource().getUser().getNick() + " who guessed the word " + word);
-                gameSessions.remove(channelName);
+                this.gameSessions.remove(channelName);
                 return;
             } else {
                 session.reduceLives();
-                sendUpdate(event.getSource().getBot(), channelName);
+                this.sendUpdate(event.getSource().getBot(), channelName);
             }
         } else { // Attempt guess of letter
             if (!session.isGuessedLetter(letter) && Character.isLetter(letter)) { // check if letter is unused
 
                 // Check if guess letter is right
-                if (session.getWord().contains(letter + "")) {
+                if (session.getWord().contains(String.valueOf(letter))) {
                     session.addGuess(letter);
                     session.updateGuess(letter);
 
@@ -162,10 +166,10 @@ public final class HangmanGameModule extends CommandModule {
                         TitanBot.sendReply(event.getSource(), "This game was won by "
                                 + event.getSource().getUser().getNick() + " who guessed the last letter " + word
                                 + " of word " + session.getWord());
-                        gameSessions.remove(channelName);
+                        this.gameSessions.remove(channelName);
                         return;
                     } else { // update
-                        sendUpdate(event.getSource().getBot(), channelName);
+                        this.sendUpdate(event.getSource().getBot(), channelName);
                     }
                 } else {
                     session.addGuess(letter);
@@ -177,7 +181,7 @@ public final class HangmanGameModule extends CommandModule {
         // Check if out of lives
         if (!session.hasLives()) {
             TitanBot.sendReply(event.getSource(), "Game session ended, you lost. The word was: " + session.getWord());
-            gameSessions.remove(channelName);
+            this.gameSessions.remove(channelName);
         }
     }
 
@@ -190,7 +194,8 @@ public final class HangmanGameModule extends CommandModule {
     public void getHelp(CommandEvent event) {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " start | " + event.getArgs()[0]
                 + " stop | " + event.getArgs()[0] + " progress | Type single letters/whole words in channel"
-                + (RESTRICTED_CHANNEL.equalsIgnoreCase("NO") ? "" : " | Restricted to " + RESTRICTED_CHANNEL));
+                + (HangmanGameModule.RESTRICTED_CHANNEL.equalsIgnoreCase("NO") ? "" : " | Restricted to " + HangmanGameModule
+                .RESTRICTED_CHANNEL));
     }
 
     /**
@@ -198,8 +203,8 @@ public final class HangmanGameModule extends CommandModule {
      * @param channelName
      * @return
      */
-    private boolean isAllowed(String channelName) {
-        return RESTRICTED_CHANNEL.equalsIgnoreCase("NO") || RESTRICTED_CHANNEL.equalsIgnoreCase(channelName);
+    private static boolean isAllowed(String channelName) {
+        return HangmanGameModule.RESTRICTED_CHANNEL.equalsIgnoreCase("NO") || HangmanGameModule.RESTRICTED_CHANNEL.equalsIgnoreCase(channelName);
     }
 
     /**
@@ -212,8 +217,8 @@ public final class HangmanGameModule extends CommandModule {
          */
         private static final int INTIAL_LIVES = 8;
         private final List<Character> guessedLetters = new ArrayList<>();
-        private int lives = INTIAL_LIVES;
-        private String word;
+        private int lives = HangmanGameModule.GameSession.INTIAL_LIVES;
+        private final String word;
         private String guessWord;
 
         public GameSession(String word) {
@@ -225,64 +230,64 @@ public final class HangmanGameModule extends CommandModule {
             for (int i = 0; i < word.length(); i++) {
                 guess += "_";
             }
-            guessWord = guess;
+            this.guessWord = guess;
         }
 
         public String getWord() {
-            return word;
+            return this.word;
         }
 
         public boolean isFinished() {
-            return !guessWord.contains("_");
+            return !this.guessWord.contains("_");
         }
 
         public void reduceLives() {
-            lives--;
+            this.lives--;
         }
 
         public boolean hasLives() {
-            return lives > 0;
+            return this.lives > 0;
         }
 
         public String getGuessWord() {
-            return guessWord;
+            return this.guessWord;
         }
 
         public void addGuess(char letter) {
-            guessedLetters.add(letter);
+            this.guessedLetters.add(letter);
         }
 
         public void updateGuess(char letter) {
             String guess = "";
 
-            for (int i = 0; i < word.length(); i++) {
-                if (word.charAt(i) == letter) {
+            for (int i = 0; i < this.word.length(); i++) {
+                if (this.word.charAt(i) == letter) {
                     guess += letter;
                 } else {
-                    guess += guessWord.charAt(i);
+                    guess += this.guessWord.charAt(i);
                 }
             }
-            guessWord = guess;
+            this.guessWord = guess;
         }
 
         public String getGuessedLetters() {
             String s = "";
 
-            for (char c : guessedLetters) {
+            for (char c : this.guessedLetters) {
                 s += c + " ";
             }
             return s;
         }
 
         public boolean isGuessedLetter(char c) {
-            for (char x : guessedLetters)
+            for (char x : this.guessedLetters)
                 if (x == c)
                     return true;
             return false;
         }
 
         public int getLives() {
-            return lives;
+            return this.lives;
         }
     }
 }

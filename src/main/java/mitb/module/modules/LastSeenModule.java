@@ -35,8 +35,9 @@ public final class LastSeenModule extends CommandModule {
      */
     @Override
     public void onCommand(CommandEvent commandEvent) {
-        if (commandEvent.getArgs().length == 0)
+        if (commandEvent.getArgs().length == 0) {
             return;
+        }
 
         // Preparing and responding using query
         String nick = Joiner.on(" ").join(commandEvent.getArgs());

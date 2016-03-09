@@ -44,24 +44,24 @@ public final class WolframEvaluationModule extends CommandModule {
     /**
      * A list of matched result pod titles.
      */
-    private static String[] RESULT_POD_TITLES = new String[]{"Result", "Exact result", "Limit", "Derivative", "Indefinite integral", "Definite integral"};
+    private static final String[] RESULT_POD_TITLES = {"Result", "Exact result", "Limit", "Derivative", "Indefinite integral", "Definite integral"};
 
     static {
-        generateXPathCaptureGroup();
+        WolframEvaluationModule.generateXPathCaptureGroup();
     }
 
     /**
      * Generates results for x-path capturing.
      */
     private static void generateXPathCaptureGroup() {
-        XPATH_RESULT_TITLES = "";
+        WolframEvaluationModule.XPATH_RESULT_TITLES = "";
 
-        for (int i = 0; i < RESULT_POD_TITLES.length; i++) {
-            String title = RESULT_POD_TITLES[i];
-            XPATH_RESULT_TITLES += "@title='" + title + "'";
+        for (int i = 0; i < WolframEvaluationModule.RESULT_POD_TITLES.length; i++) {
+            String title = WolframEvaluationModule.RESULT_POD_TITLES[i];
+            WolframEvaluationModule.XPATH_RESULT_TITLES += "@title='" + title + '\'';
 
-            if (i + 1 < RESULT_POD_TITLES.length)
-                XPATH_RESULT_TITLES += " or ";
+            if ((i + 1) < WolframEvaluationModule.RESULT_POD_TITLES.length)
+                WolframEvaluationModule.XPATH_RESULT_TITLES += " or ";
         }
     }
 
@@ -78,27 +78,28 @@ public final class WolframEvaluationModule extends CommandModule {
     /**
      * Reply with an example response on command.
      *
-     * @param event
+     * @param commandEvent
      */
     @Override
-    public void onCommand(CommandEvent event) {
-        if (event.getArgs().length == 0)
+    public void onCommand(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().length == 0) {
             return;
+        }
 
         // Checking if api key is set
-        if (API_KEY.equalsIgnoreCase("NONE")) {
-            TitanBot.sendReply(event.getSource(), "API key for wolfram is not configured.");
+        if (WolframEvaluationModule.API_KEY.equalsIgnoreCase("NONE")) {
+            TitanBot.sendReply(commandEvent.getSource(), "API key for wolfram is not configured.");
             return;
         }
 
         // Constructing query
-        String query = Joiner.on(" ").join(event.getArgs());
+        String query = Joiner.on(" ").join(commandEvent.getArgs());
 
         // Check cache
-        String result = CACHE.getIfPresent(query);
+        String result = WolframEvaluationModule.CACHE.getIfPresent(query);
 
         if (result != null) {
-            TitanBot.sendReply(event.getSource(), result);
+            TitanBot.sendReply(commandEvent.getSource(), result);
             return;
         }
 
@@ -106,44 +107,45 @@ public final class WolframEvaluationModule extends CommandModule {
         String sanitizedQuery = StringHelper.urlEncode(query);
 
         if (sanitizedQuery == null) {
-            TitanBot.sendReply(event.getSource(), "Error encoding query for wolfram.");
+            TitanBot.sendReply(commandEvent.getSource(), "Error encoding query for wolfram.");
             return;
         }
 
         // Api call
-        String url = API_URL + sanitizedQuery + "&appid=" + API_KEY;
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        asyncHttpClient.prepareGet(url)
-                .addHeader("Accept", "text/plain")
-                .execute(new AsyncCompletionHandler<Response>() {
+        String url = WolframEvaluationModule.API_URL + sanitizedQuery + "&appid=" + WolframEvaluationModule.API_KEY;
+        try (AsyncHttpClient asyncHttpClient = new AsyncHttpClient()) {
+            asyncHttpClient.prepareGet(url)
+                    .addHeader("Accept", "text/plain")
+                    .execute(new AsyncCompletionHandler<Response>() {
 
-                    @Override
-                    public Response onCompleted(Response response) throws Exception {
-                        // Parsing response
-                        String body = response.getResponseBody();
-                        String result = parseResult(body);
+                        @Override
+                        public Response onCompleted(Response response) throws Exception {
+                            // Parsing response
+                            String body = response.getResponseBody();
+                            String result = WolframEvaluationModule.parseResult(body);
 
-                        // Outputting response
-                        if (result != null) {
-                            result = StringEscapeUtils.unescapeHtml4(result); // unescaping character entities
-                            String output = query + " = " + result;
+                            // Outputting response
+                            if (result != null) {
+                                result = StringEscapeUtils.unescapeHtml4(result); // unescaping character entities
+                                String output = query + " = " + result;
 
-                            // Updating cache
-                            CACHE.put(query, output);
+                                // Updating cache
+                                WolframEvaluationModule.CACHE.put(query, output);
 
-                            // Send response
-                            TitanBot.sendReply(event.getSource(), output);
-                        } else {
-                            TitanBot.sendReply(event.getSource(), "No result found for: " + query);
+                                // Send response
+                                TitanBot.sendReply(commandEvent.getSource(), output);
+                            } else {
+                                TitanBot.sendReply(commandEvent.getSource(), "No result found for: " + query);
+                            }
+                            return response;
                         }
-                        return response;
-                    }
 
-                    @Override
-                    public void onThrowable(Throwable t) {
-                        // XXX output error
-                    }
-                });
+                        @Override
+                        public void onThrowable(Throwable t) {
+                            // XXX output error
+                        }
+                    });
+        }
     }
 
     /**
@@ -152,12 +154,12 @@ public final class WolframEvaluationModule extends CommandModule {
      * @param content
      * @return Result (in plaintext) or null if not found.
      */
-    private String parseResult(String content) {
+    private static String parseResult(String content) {
         XML xml = new XMLDocument(content);
 
         // Global response capturing
-        List results = xml.xpath("/queryresult[@success='true']/pod[" + XPATH_RESULT_TITLES + "]/subpod/plaintext/text()");
-        return results.size() >= 0 ? results.get(0).toString() : null; // Fall-back no result found
+        List results = xml.xpath("/queryresult[@success='true']/pod[" + WolframEvaluationModule.XPATH_RESULT_TITLES + "]/subpod/plaintext/text()");
+        return (results.size() >= 0) ? results.get(0).toString() : null; // Fall-back no result found
     }
 
     @Override

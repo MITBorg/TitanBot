@@ -22,11 +22,11 @@ public final class HelpModule extends CommandModule {
     }
 
     @Override
-    public void onCommand(CommandEvent event) {
-        if (event.getArgs().length == 0) { // List of modules
-            sendModulesList(event);
+    public void onCommand(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().length == 0) { // List of modules
+            HelpModule.sendModulesList(commandEvent);
         } else { // Help for specific module
-            sendModuleHelp(event);
+            this.sendModuleHelp(commandEvent);
         }
     }
 
@@ -43,7 +43,7 @@ public final class HelpModule extends CommandModule {
                     return;
                 }
             } else { // Regular module help
-                String className = getModuleName(module);
+                String className = HelpModule.getModuleName(module);
 
                 if (className.equalsIgnoreCase(moduleName)) {
                     module.getHelp(event);
@@ -56,7 +56,7 @@ public final class HelpModule extends CommandModule {
         TitanBot.sendReply(event.getSource(), "No module found with name: " + moduleName);
     }
 
-    private void sendModulesList(CommandEvent event) {
+    private static void sendModulesList(CommandEvent event) {
         // Generate list of modules
         StringBuilder moduleList = new StringBuilder();
 
@@ -64,9 +64,9 @@ public final class HelpModule extends CommandModule {
         for (Module module : TitanBot.MODULES) {
             if (module instanceof CommandModule) { // Command module name, from commands array
                 CommandModule cmd = (CommandModule) module;
-                moduleList.append(cmd.getCommands()[0]).append(" ");
+                moduleList.append(cmd.getCommands()[0]).append(' ');
             } else { // Regular module name, derived from class name
-                moduleList.append(getModuleName(module)).append(" ");
+                moduleList.append(HelpModule.getModuleName(module)).append(' ');
             }
         }
 

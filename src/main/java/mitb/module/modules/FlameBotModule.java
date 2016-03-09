@@ -13,12 +13,13 @@ import mitb.module.Module;
 public final class FlameBotModule extends Module {
 
     @Listener
-    public void onJoin(JoinEvent event) {
+    public static void onJoin(JoinEvent event) {
         org.pircbotx.hooks.events.JoinEvent evt = event.getSource();
 
         // Validate input
-        if (evt.getUser() == null)
+        if (evt.getUser() == null) {
             return;
+        }
 
         String nick = evt.getUser().getNick();
 

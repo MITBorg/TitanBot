@@ -24,7 +24,7 @@ public final class EventHandler {
      * @param o object to register the events of
      */
     public static void register(Object o) {
-        if (eventListeners.containsKey(o)) {
+        if (EventHandler.eventListeners.containsKey(o)) {
             return;
         }
         HashMap<Method, Class<? extends Event>> list = new HashMap<>();
@@ -34,7 +34,7 @@ public final class EventHandler {
                 list.put(method, (Class<? extends Event>) method.getParameterTypes()[0]);
             }
         }
-        eventListeners.put(o, list);
+        EventHandler.eventListeners.put(o, list);
     }
 
     /**
@@ -44,16 +44,17 @@ public final class EventHandler {
      */
     public static void trigger(Event event) {
         // Handle ignored nicks
-        if (ignoredNicksLoaded() &&  event instanceof ProxyEvent) {
+        if (EventHandler.ignoredNicksLoaded() && (event instanceof ProxyEvent)) {
             ProxyEvent evt = (ProxyEvent)event;
             String callerNick = PIrcBotXHelper.getNick(evt.getSource());
 
-            if (isIgnoredNick(callerNick))
+            if (EventHandler.isIgnoredNick(callerNick)) {
                 return;
+            }
         }
 
         // Attempt trigger
-        eventListeners.entrySet().stream().forEach(entry -> {
+        EventHandler.eventListeners.entrySet().stream().forEach(entry -> {
             Map<Method, Class<? extends Event>> events = entry.getValue();
 
             events.entrySet().stream().filter(e -> e.getValue().isInstance(event)).forEach(e -> {
@@ -71,8 +72,8 @@ public final class EventHandler {
      * @return
      */
     private static boolean ignoredNicksLoaded() {
-        int len = IGNORED_NICKS.length;
-        return len != 0 && !(IGNORED_NICKS[0].equalsIgnoreCase("NONE") && len == 1);
+        int len = EventHandler.IGNORED_NICKS.length;
+        return (len != 0) && !(EventHandler.IGNORED_NICKS[0].equalsIgnoreCase("NONE") && (len == 1));
     }
 
     /**
@@ -81,9 +82,10 @@ public final class EventHandler {
      * @return
      */
     private static boolean isIgnoredNick(String nick) {
-        for (int i = 0; i < IGNORED_NICKS.length; i++) {
-            if (IGNORED_NICKS[i].equalsIgnoreCase(nick))
+        for (int i = 0; i < EventHandler.IGNORED_NICKS.length; i++) {
+            if (EventHandler.IGNORED_NICKS[i].equalsIgnoreCase(nick)) {
                 return true;
+            }
         }
         return false;
     }

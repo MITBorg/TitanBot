@@ -31,8 +31,8 @@ public final class PIrcBotXHelper {
      * @return {@link User} or null if the event type is invalid or the user object instance is null.
      */
     public static String getNick(GenericEvent event) {
-        User u = getUser(event);
-        return u == null ? null : u.getNick().toLowerCase();
+        User u = PIrcBotXHelper.getUser(event);
+        return (u == null) ? null : u.getNick().toLowerCase();
     }
 
     /**
@@ -41,8 +41,8 @@ public final class PIrcBotXHelper {
      * @return Channel name or null if the event type is invalid
      */
     public static String getChannelName(GenericEvent event) {
-        if (event instanceof org.pircbotx.hooks.events.MessageEvent) {
-            return ((org.pircbotx.hooks.events.MessageEvent)event).getChannelSource();
+        if (event instanceof MessageEvent) {
+            return ((MessageEvent)event).getChannelSource();
         }
         return null; // invalid event type
     }

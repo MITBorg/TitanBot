@@ -30,7 +30,7 @@ public final class AzGameModule extends CommandModule {
     /**
      * Game sessions, each channel name gets a unique one.
      */
-    private final HashMap<String, GameSession> gameSessions = new HashMap<>();
+    private final HashMap<String, AzGameModule.GameSession> gameSessions = new HashMap<>();
     /**
      * Random instance, to generate words to challenge for.
      */
@@ -45,7 +45,8 @@ public final class AzGameModule extends CommandModule {
     public void getHelp(CommandEvent event) {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " start | " + event.getArgs()[0]
                 + " stop | " + event.getArgs()[0] + " range | Type single words in channel"
-                + (RESTRICTED_CHANNEL.equalsIgnoreCase("NO") ? "" : " | Restricted to " + RESTRICTED_CHANNEL));
+                + (AzGameModule.RESTRICTED_CHANNEL.equalsIgnoreCase("NO") ? "" : " | Restricted to " + AzGameModule
+                .RESTRICTED_CHANNEL));
     }
 
     /**
@@ -73,30 +74,31 @@ public final class AzGameModule extends CommandModule {
             return;
 
         // Process command
-        GameSession session = gameSessions.get(channelName);
+        AzGameModule.GameSession session = this.gameSessions.get(channelName);
 
         if (cmd.equals("start")) { // starts a game session for a channel
-            startSession(channelName, session, event);
+            this.startSession(channelName, session, event);
         } else if (cmd.equals("stop")) { // stops a game session for a channel
-            stopSession(channelName, session, event);
+            this.stopSession(channelName, session, event);
         } else if (cmd.equals("range")) { // displays the word range for a channel
-            updateRange(channelName, session, event);
+            this.updateRange(channelName, session, event);
         }
     }
 
-    private void startSession(String channelName, GameSession session, CommandEvent event) {
+    private void startSession(String channelName, AzGameModule.GameSession session, CommandEvent event) {
         if (event.getSource().getBot().getUserChannelDao().containsChannel(channelName)) {
             if (session == null) { // no game session, start session
                 // check if allowed to run
-                if (!isAllowed(channelName)) {
-                    TitanBot.sendReply(event.getSource(), "This module is restricted to " + RESTRICTED_CHANNEL);
+                if (!this.isAllowed(channelName)) {
+                    TitanBot.sendReply(event.getSource(), "This module is restricted to " + AzGameModule
+                            .RESTRICTED_CHANNEL);
                     return;
                 }
 
                 // regular game session create logic
-                String word = getRandomWord();
-                gameSessions.put(channelName, new GameSession(word));
-                sendUpdate(event.getSource().getBot(), channelName);
+                String word = this.getRandomWord();
+                this.gameSessions.put(channelName, new AzGameModule.GameSession(word));
+                this.sendUpdate(event.getSource().getBot(), channelName);
                 TitanBot.getLogger().info("A-Z instance started for " + channelName + " with solution: " + word);
             } else { // game in progress, nothing to do
                 TitanBot.sendReply(event.getSource(), "A game session for this channel already exists, try checking the progress.");
@@ -106,17 +108,17 @@ public final class AzGameModule extends CommandModule {
         }
     }
 
-    private void updateRange(String channelName, GameSession session, CommandEvent event) {
+    private void updateRange(String channelName, AzGameModule.GameSession session, CommandEvent event) {
         if (session == null) { // not existent
             TitanBot.sendReply(event.getSource(), "No game session in progress for this channel. Try creating one.");
         } else { // game in progress
-            sendUpdate(event.getSource().getBot(), channelName);
+            this.sendUpdate(event.getSource().getBot(), channelName);
         }
     }
 
-    private void stopSession(String channelName, GameSession session, CommandEvent event) {
+    private void stopSession(String channelName, AzGameModule.GameSession session, CommandEvent event) {
         if (session != null) {
-            gameSessions.remove(channelName);
+            this.gameSessions.remove(channelName);
             TitanBot.sendReply(event.getSource(), "Game session ended, the word was: " + session.getWord());
         } else {
             TitanBot.sendReply(event.getSource(), "No game session to end in " + channelName);
@@ -129,22 +131,22 @@ public final class AzGameModule extends CommandModule {
      * @return
      */
     private boolean isAllowed(String channelName) {
-        return RESTRICTED_CHANNEL.equalsIgnoreCase("NO") || RESTRICTED_CHANNEL.equalsIgnoreCase(channelName);
+        return AzGameModule.RESTRICTED_CHANNEL.equalsIgnoreCase("NO") || AzGameModule.RESTRICTED_CHANNEL.equalsIgnoreCase(channelName);
     }
 
     @Listener
     public void onMessage(MessageEvent event) {
-        if (gameSessions.size() == 0)
+        if (this.gameSessions.size() == 0)
             return;
 
         // Check if this channel has a game session
         String channelName = event.getSource().getChannel().getName();
 
-        if (!gameSessions.containsKey(channelName))
+        if (!this.gameSessions.containsKey(channelName))
             return;
 
         // Process message
-        GameSession session = gameSessions.get(channelName);
+        AzGameModule.GameSession session = this.gameSessions.get(channelName);
         String word = event.getSource().getMessage().toLowerCase();
 
         // Check if the message is a valid word
@@ -159,13 +161,13 @@ public final class AzGameModule extends CommandModule {
         if (session.getWord().equals(word)) { // if correct guess
             TitanBot.sendReply(event.getSource(), "This game was won by "
                     + event.getSource().getUser().getNick() + " who guessed the word " + word);
-            gameSessions.remove(channelName);
+            this.gameSessions.remove(channelName);
         } else if (lbc < 0 && wc > 0) { // if new lower bound
             session.setLowerBoundWord(word);
-            sendUpdate(event.getSource().getBot(), channelName);
+            this.sendUpdate(event.getSource().getBot(), channelName);
         } else if (upc > 0 && wc < 0) { // if new upper bound
             session.setUpperBoundWord(word);
-            sendUpdate(event.getSource().getBot(), channelName);
+            this.sendUpdate(event.getSource().getBot(), channelName);
         }
     }
 
@@ -175,7 +177,7 @@ public final class AzGameModule extends CommandModule {
     }
 
     private void sendUpdate(PircBotX bot, String channelName) {
-        GameSession session = gameSessions.get(channelName);
+        AzGameModule.GameSession session = this.gameSessions.get(channelName);
         String state = "[A-Z Update] " + session.getLowerBoundWord() + "-" + session.getUpperBoundWord();
         bot.send().message(channelName, state);
     }
@@ -185,7 +187,7 @@ public final class AzGameModule extends CommandModule {
      * @return
      */
     public String getRandomWord() {
-        return StringHelper.wordList[RANDOM.nextInt(StringHelper.wordList.length - 2) + 1]; // XXX test range
+        return StringHelper.wordList[AzGameModule.RANDOM.nextInt(StringHelper.wordList.length - 2) + 1]; // XXX test range
     }
 
 
@@ -196,22 +198,22 @@ public final class AzGameModule extends CommandModule {
 
         private String lowerBoundWord = StringHelper.wordList[0];
         private String upperBoundWord = StringHelper.wordList[StringHelper.wordList.length - 1];
-        private String word;
+        private final String word;
 
         public GameSession(String word) {
             this.word = word;
         }
 
         public String getLowerBoundWord() {
-            return lowerBoundWord;
+            return this.lowerBoundWord;
         }
 
         public String getUpperBoundWord() {
-            return upperBoundWord;
+            return this.upperBoundWord;
         }
 
         public String getWord() {
-            return word;
+            return this.word;
         }
 
         public void setLowerBoundWord(String lowerBoundWord) {

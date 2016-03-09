@@ -36,11 +36,13 @@ public final class SedReplacementModule extends Module {
 
             // Continue as normal
             if (matcher.matches()) {
-                if (!this.cache.containsKey(callerNick)) return;
+                if (!this.cache.containsKey(callerNick)) {
+                    return;
+                }
 
                 msg = this.cache.get(callerNick).replaceAll(matcher.group(1), matcher.group(2));
 
-                if (matcher.group(4) != null && matcher.group(5) != null) {
+                if ((matcher.group(4) != null) && (matcher.group(5) != null)) {
                     msg = msg.replaceAll(matcher.group(4), matcher.group(5));
                 }
                 event.getSource().respondWith(callerNick + " meant: " + msg);

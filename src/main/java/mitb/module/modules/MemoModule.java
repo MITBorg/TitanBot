@@ -35,11 +35,12 @@ public final class MemoModule extends CommandModule {
     }
 
     @Override
-    public void onCommand(CommandEvent event) {
-        if (event.getArgs().length == 0)
+    public void onCommand(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().length == 0) {
             return;
+        }
 
-        User callerUser = PIrcBotXHelper.getUser(event.getSource());
+        User callerUser = PIrcBotXHelper.getUser(commandEvent.getSource());
 
         // Invalid caller/source event
         if (callerUser == null) {
@@ -56,48 +57,50 @@ public final class MemoModule extends CommandModule {
 
         // Disallow access by unverified users
         if (!callerUser.isVerified()) {
-            TitanBot.sendReply(event.getSource(), "You must be identified for your nick to use memo.");
+            TitanBot.sendReply(commandEvent.getSource(), "You must be identified for your nick to use memo.");
             return;
         }
 
         // Handle command
-        String cmd = event.getArgs()[0].toLowerCase();
+        String cmd = commandEvent.getArgs()[0].toLowerCase();
 
-        if (cmd.equals("add") && event.getArgs().length >= 3) { // Adding a new message
-            addMessage(event, callerNick);
-        } else if (cmd.equals("view") && event.getArgs().length >= 2) { // Viewing a message
-            viewMessage(event, callerNick);
+        if (cmd.equals("add") && (commandEvent.getArgs().length >= 3)) { // Adding a new message
+            this.addMessage(commandEvent, callerNick);
+        } else if (cmd.equals("view") && (commandEvent.getArgs().length >= 2)) { // Viewing a message
+            this.viewMessage(commandEvent, callerNick);
         } else if (cmd.equals("pending")) { // Seeing pending messages
-            viewPending(event, callerNick);
+            this.viewPending(commandEvent, callerNick);
         }
     }
 
     /**
      * Sends a list of users who have pending memos for the caller.
-     * @param event
-     * @param callerNick
+     *
+     * @param event command event triggering this method call
+     * @param callerNick nick of the person calling this method
      */
     private void viewPending(CommandEvent event, String callerNick) {
-        String msg = getPendingMessageSenders(getMessageSenders(callerNick));
+        String msg = MemoModule.getPendingMessageSenders(MemoModule.getMessageSenders(callerNick));
 
         // Reply
-        String output = msg == null ? "There are no memos for you." : "There are memo for you from: " + msg;
+        String output = (msg == null) ? "There are no memos for you." : ("There are memo for you from: " + msg);
         TitanBot.sendReply(event.getSource(), output);
     }
 
     /**
      * Views a message from a user.
-     * @param event
-     * @param callerNick
+     *
+     * @param event command event triggering this method call
+     * @param callerNick nick of the person calling this method
      */
     private void viewMessage(CommandEvent event, String callerNick) {
         String senderNick = event.getArgs()[1].toLowerCase();
-        String memoMessage = getMessage(senderNick, callerNick);
+        String memoMessage = MemoModule.getMessage(senderNick, callerNick);
 
         // Attempting to view message
         if (memoMessage != null) {
-            TitanBot.sendReply(event.getSource(), "[" + senderNick + "] " + memoMessage);
-            deleteMessage(senderNick, callerNick);
+            TitanBot.sendReply(event.getSource(), '[' + senderNick + "] " + memoMessage);
+            MemoModule.deleteMessage(senderNick, callerNick);
         } else {
             TitanBot.sendReply(event.getSource(), "There is no message for you from: " + senderNick);
         }
@@ -105,21 +108,23 @@ public final class MemoModule extends CommandModule {
 
     /**
      * Adds a message for a user.
-     * @param event
-     * @param callerNick
+     *
+     * @param event command event triggering this method call
+     * @param callerNick nick of the person calling this method
      */
     private void addMessage(CommandEvent event, String callerNick) {
         String targetNick = event.getArgs()[1].toLowerCase();
         String msg = Joiner.on(" ").join(Arrays.copyOfRange(event.getArgs(), 2, event.getArgs().length));
 
         // Ensuring length is valid
-        if (msg.length() > 250)
+        if (msg.length() > 250) {
             msg = msg.substring(0, 250 - 1 - 3) + "...";
+        }
 
         // Adding/updating message
         if (!targetNick.equals(callerNick) && !targetNick.equalsIgnoreCase(event.getSource().getBot().getNick())) {
             // Add message to database
-            updateMessage(callerNick, targetNick, msg);
+            MemoModule.updateMessage(callerNick, targetNick, msg);
 
             // Try to inform target, if they are online
             event.getSource().getBot().send().message(targetNick, "There is a new memo for you from: " + callerNick);
@@ -127,7 +132,7 @@ public final class MemoModule extends CommandModule {
             // Reply
             TitanBot.sendReply(event.getSource(), "Your message to " + targetNick + " was recorded.");
         } else {
-            TitanBot.sendReply(event.getSource(), "You cant queue a message to yourself/the bot!");
+            TitanBot.sendReply(event.getSource(), "You cant queue a message to yourself or the bot!");
         }
     }
 
@@ -142,7 +147,7 @@ public final class MemoModule extends CommandModule {
 
         // Sending joined users a list of their pending memos
         if (!evt.getUser().getNick().equals(evt.getBot().getNick())) {
-            String pendingMessageSenders = getPendingMessageSenders(getMessageSenders(targetNick));
+            String pendingMessageSenders = MemoModule.getPendingMessageSenders(MemoModule.getMessageSenders(targetNick));
 
             // Send message if memos are available
             if (pendingMessageSenders != null) {
@@ -153,17 +158,19 @@ public final class MemoModule extends CommandModule {
 
     /**
      * Constructs a message for a user about who has pending messages for them, with who they are from.
-     * @paran senders
+     *
+     * @param senders nicks who have sent this user message
      */
-    private String getPendingMessageSenders(List<String> senders) {
-        if (senders.size() == 0)
+    private static String getPendingMessageSenders(List<String> senders) {
+        if (senders.isEmpty()) {
             return null;
+        }
 
         // Construct message
         StringBuilder sb = new StringBuilder();
 
         for (String sender : senders) {
-            sb.append(sender).append(" ");
+            sb.append(sender).append(' ');
         }
         return sb.toString();
     }
@@ -175,11 +182,12 @@ public final class MemoModule extends CommandModule {
 
     /**
      * Updates a stored message.
-     * @param fromNick
-     * @param targetNick
-     * @param message
+     *
+     * @param fromNick nick of the person storing this memo
+     * @param targetNick nick of the person the memo should go to
+     * @param message message to queue for the user
      */
-    private void updateMessage(String fromNick, String targetNick, String message) {
+    private static void updateMessage(String fromNick, String targetNick, String message) {
         try {
             PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "INSERT OR REPLACE INTO memo (id, target_nick, sender_nick, message) VALUES ((SELECT id FROM memo WHERE target_nick = ? AND sender_nick = ?), ?, ?, ?)"
@@ -191,16 +199,17 @@ public final class MemoModule extends CommandModule {
             statement.setString(5, message);
             statement.executeUpdate();
         } catch(SQLException e) {
-            e.printStackTrace();
+            TitanBot.getLogger().error("There was an error while queuing a memo.", e);
         }
     }
 
     /**
      * Deletes a stored message.
-     * @param senderNick
-     * @param targetNick
+     *
+     * @param senderNick nick of the user deleting this memo
+     * @param targetNick nick of the user this memo was for
      */
-    private void deleteMessage(String senderNick, String targetNick) {
+    private static void deleteMessage(String senderNick, String targetNick) {
         try {
             PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "DELETE FROM memo WHERE target_nick = ? AND sender_nick = ?"
@@ -209,17 +218,17 @@ public final class MemoModule extends CommandModule {
             statement.setString(2, senderNick);
             statement.executeUpdate();
         } catch(SQLException e) {
-            e.printStackTrace();
+            TitanBot.getLogger().error("There was an error while deleting a memo.", e);
         }
     }
 
     /**
      * Gets the stored message for a user from another user
-     * @param senderNick
-     * @param targetNick
-     * @return
+     * @param senderNick nick of who sent the message
+     * @param targetNick nick of who the memo was for
+     * @return queued memo
      */
-    private String getMessage(String senderNick, String targetNick) {
+    private static String getMessage(String senderNick, String targetNick) {
         try {
             PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "SELECT message FROM memo WHERE sender_nick = ? AND target_nick = ?"
@@ -229,15 +238,17 @@ public final class MemoModule extends CommandModule {
             ResultSet resultSet = statement.executeQuery();
             return resultSet.getString("message");
         } catch (SQLException e) {
+            TitanBot.getLogger().error("There was an error while getting a memo.", e);
             return null;
         }
     }
 
     /**
      * A list of users who have messages for this user.
-     * @param targetNick
+     *
+     * @param targetNick nick to get queued memo nicks for
      */
-    private List<String> getMessageSenders(String targetNick) {
+    private static List<String> getMessageSenders(String targetNick) {
         try {
             List<String> l = new ArrayList<>();
 
@@ -253,6 +264,7 @@ public final class MemoModule extends CommandModule {
             }
             return l;
         } catch (SQLException e) {
+            TitanBot.getLogger().error("There was an error while getting memo senders.", e);
             return null;
         }
     }

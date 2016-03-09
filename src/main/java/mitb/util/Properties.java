@@ -19,7 +19,7 @@ public final class Properties {
      * @return configuration value
      */
     public static String getValue(String key) {
-        return RESOURCE_BUNDLE.getString(key);
+        return Properties.RESOURCE_BUNDLE.getString(key);
     }
 
     /**
@@ -29,7 +29,7 @@ public final class Properties {
      * @return configuration value
      */
     public static int getValueAsInt(String key) {
-        return Integer.parseInt(RESOURCE_BUNDLE.getString(key));
+        return Integer.parseInt(Properties.RESOURCE_BUNDLE.getString(key));
     }
 
     /**
@@ -39,6 +39,6 @@ public final class Properties {
      * @return configuration value
      */
     public static double getValueAsDouble(String key) {
-        return Double.parseDouble(RESOURCE_BUNDLE.getString(key));
+        return Double.parseDouble(Properties.RESOURCE_BUNDLE.getString(key));
     }
 }

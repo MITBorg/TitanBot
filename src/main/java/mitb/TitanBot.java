@@ -43,7 +43,7 @@ public final class TitanBot {
      * @return
      */
     public static Logger getLogger() {
-        return LOGGER;
+        return TitanBot.LOGGER;
     }
 
     /**
@@ -51,7 +51,7 @@ public final class TitanBot {
      * @return
      */
     public static Connection getDatabaseConnection() {
-        return databaseConnection;
+        return TitanBot.databaseConnection;
     }
 
     /**
@@ -79,7 +79,7 @@ public final class TitanBot {
      * @param reply message we should send.
      */
     public static void sendReply(GenericEvent event, String reply, String truncatedText) {
-        if (RATE_LIMITER.tryAcquire()) {
+        if (TitanBot.RATE_LIMITER.tryAcquire()) {
             if (event instanceof MessageEvent) {
                 MessageEvent messageEvent = (MessageEvent) event;
 
@@ -130,25 +130,26 @@ public final class TitanBot {
      * Entry point to TitanBot.
      */
     public void run() throws Exception {
-        setDatabaseConnection(DriverManager.getConnection("jdbc:sqlite:database.db"));
+        TitanBot.setDatabaseConnection(DriverManager.getConnection("jdbc:sqlite:database.db"));
 
         StringHelper.loadWordList(Properties.getValue("games.wordlist"));
         EventHandler.register(new CommandHandler());
         this.registerModules();
         this.createTables();
 
-        Configuration configuration = generateConfiguration();
+        Configuration configuration = TitanBot.generateConfiguration();
 
         // Now start the bot
-        PircBotX bot = new PircBotX(configuration);
-        bot.startBot();
+        try (PircBotX bot = new PircBotX(configuration)) {
+            bot.startBot();
+        }
     }
 
     /**
      * Generates bot {@link Configuration}.
      * @return This bots configuration based on its {@link Properties}.
      */
-    private Configuration generateConfiguration() {
+    private static Configuration generateConfiguration() {
         // Building configuration
         Configuration.Builder configBuilder = new Configuration.Builder()
                 .setName(Properties.getValue("bot.nick"))
@@ -185,23 +186,23 @@ public final class TitanBot {
      */
     private void registerModules() {
         // MODULES.add(new TestCommandModule()); // test module - demonstrates how to add your own
-        MODULES.add(new LastSeenModule());
-        MODULES.add(new StatsModule());
-        MODULES.add(new UrbanDictionaryModule());
-        MODULES.add(new HelpModule());
-        MODULES.add(new SedReplacementModule());
-        MODULES.add(new WeatherModule());
-        MODULES.add(new MemoModule());
-        MODULES.add(new FlameBotModule());
-        MODULES.add(new GoogleSearchModule());
-        MODULES.add(new QuotesModule());
-        MODULES.add(new WolframEvaluationModule());
-        MODULES.add(new AzGameModule());
-        MODULES.add(new RepoModule());
-        MODULES.add(new HangmanGameModule());
-        MODULES.add(new YoutubeLookupModule());
+        TitanBot.MODULES.add(new LastSeenModule());
+        TitanBot.MODULES.add(new StatsModule());
+        TitanBot.MODULES.add(new UrbanDictionaryModule());
+        TitanBot.MODULES.add(new HelpModule());
+        TitanBot.MODULES.add(new SedReplacementModule());
+        TitanBot.MODULES.add(new WeatherModule());
+        TitanBot.MODULES.add(new MemoModule());
+        TitanBot.MODULES.add(new FlameBotModule());
+        TitanBot.MODULES.add(new GoogleSearchModule());
+        TitanBot.MODULES.add(new QuotesModule());
+        TitanBot.MODULES.add(new WolframEvaluationModule());
+        TitanBot.MODULES.add(new AzGameModule());
+        TitanBot.MODULES.add(new RepoModule());
+        TitanBot.MODULES.add(new HangmanGameModule());
+        TitanBot.MODULES.add(new YoutubeLookupModule());
 
-        getLogger().info("Registered all modules (count=" + MODULES.size() + ").");
+        TitanBot.getLogger().info("Registered all modules (count=" + TitanBot.MODULES.size() + ").");
     }
 
     /**
@@ -209,7 +210,7 @@ public final class TitanBot {
      */
     private void createTables() {
         try {
-            Statement stmt = getDatabaseConnection().createStatement();
+            Statement stmt = TitanBot.databaseConnection.createStatement();
             stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), login VARCHAR(50), seen DATETIME)");
             stmt.execute("CREATE TABLE weather (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), location VARCHAR(50))");
             stmt.execute("CREATE TABLE memo (id INTEGER PRIMARY KEY AUTOINCREMENT, target_nick VARCHAR(50), sender_nick VARCHAR(50), message VARCHAR(250))");
