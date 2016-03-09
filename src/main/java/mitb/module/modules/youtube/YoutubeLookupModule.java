@@ -76,7 +76,7 @@ public final class YoutubeLookupModule extends Module {
         String result = CACHE.getIfPresent(videoId);
 
         if (result != null) {
-            TitanBot.sendReply(event.getSource(), result);
+            event.getSource().getBot().send().message(event.getSource().getChannel().getName(), result);
             return;
         }
 
@@ -104,7 +104,7 @@ public final class YoutubeLookupModule extends Module {
                                 CACHE.put(videoId, output);
 
                                 // Send reply
-                                TitanBot.sendReply(event.getSource(), output);
+                                event.getSource().getBot().send().message(event.getSource().getChannel().getName(), output);
                             }
                         }
                         return response;
@@ -131,24 +131,16 @@ public final class YoutubeLookupModule extends Module {
         }
         Item item = items.get(0);
         Snippet snippet = item.getSnippet();
-        Statistics stats = item.getStatistics();
 
-        // Generate description
-        String description = snippet.getDescription();
+        // Truncate title if necessary
+        String title = snippet.getTitle();
 
-        if (description.length() > 200) {
-            description = description.substring(0, 200 - 3) + "...";
-        }
-        description = StringHelper.stripNewlines(description).replaceAll("  ", " ");
+        if (title.length() > 200)
+            title = title.substring(0, 200) + "...";
 
-        // Video title and description
-        sb.append(StringHelper.wrapBold(snippet.getTitle())).append(": ")
-                .append(description).append(" | ");
-
-        // Video statistics and uploaded
-        sb.append("Views: ").append(StringHelper.wrapBold(stats.getViewCount()))
-                .append(", Likes/Dislikes: ").append(StringHelper.wrapBold("+" + stats.getLikeCount() + "/-" + stats.getDislikeCount()))
-                .append(" (by ").append(StringHelper.wrapBold(snippet.getChannelTitle())).append(")");
+        // Video title
+        sb.append("Youtube: ");
+        sb.append(StringHelper.wrapBold(title));
         return sb.toString();
     }
 
