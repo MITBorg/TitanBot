@@ -5,12 +5,14 @@ import mitb.command.CommandHandler;
 import mitb.event.EventHandler;
 import mitb.irc.IRCListener;
 import mitb.module.Module;
+import mitb.module.ScriptModule;
 import mitb.module.modules.*;
 import mitb.module.modules.googsearch.GoogleSearchModule;
 import mitb.module.modules.urbandict.UrbanDictionaryModule;
 import mitb.module.modules.weather.WeatherModule;
 import mitb.module.modules.youtube.YoutubeLookupModule;
 import mitb.util.Properties;
+import mitb.util.ScriptingHelper;
 import mitb.util.StringHelper;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
@@ -22,6 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLSocketFactory;
+import javax.script.*;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -184,7 +192,7 @@ public final class TitanBot {
     /**
      * Registers all the modules of the application.
      */
-    private void registerModules() {
+    private void registerModules() throws ScriptException, IOException {
         // MODULES.add(new TestCommandModule()); // test module - demonstrates how to add your own
         TitanBot.MODULES.add(new LastSeenModule());
         TitanBot.MODULES.add(new StatsModule());
@@ -193,7 +201,6 @@ public final class TitanBot {
         TitanBot.MODULES.add(new SedReplacementModule());
         TitanBot.MODULES.add(new WeatherModule());
         TitanBot.MODULES.add(new MemoModule());
-        TitanBot.MODULES.add(new FlameBotModule());
         TitanBot.MODULES.add(new GoogleSearchModule());
         TitanBot.MODULES.add(new QuotesModule());
         TitanBot.MODULES.add(new WolframEvaluationModule());
@@ -201,6 +208,36 @@ public final class TitanBot {
         TitanBot.MODULES.add(new RepoModule());
         TitanBot.MODULES.add(new HangmanGameModule());
         TitanBot.MODULES.add(new YoutubeLookupModule());
+
+        ScriptEngineManager engineManager = new ScriptEngineManager();
+        ScriptEngine engine = engineManager.getEngineByName("nashorn");
+
+        Bindings bindings = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
+        bindings.put("helper", new ScriptingHelper());
+
+        engine.eval(new String(Files.readAllBytes(Paths.get("lib/coffeescript.js"))));
+        Invocable invocable = (Invocable) engine;
+        Object coffeeScript = engine.eval("CoffeeScript");
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get("modules"))) {
+            for (Path p : stream) {
+                engine = engineManager.getEngineByName("nashorn");
+                engine.getBindings(ScriptContext.ENGINE_SCOPE).put("engine", engine);
+
+                if (p.toString().endsWith(".js")) {
+                    engine.eval(Files.newBufferedReader(p));
+                    ((Invocable) engine).getInterface(ScriptModule.class).register();
+                } else if (p.toString().endsWith(".coffee")) {
+                    String source = new String(Files.readAllBytes((p)));
+                    Object json = ((Invocable) engine).invokeMethod(engine.eval("JSON"), "parse", "{\"bare\": true}");
+                    String javascript = (String) invocable.invokeMethod(coffeeScript, "compile", source, json);
+                    engine.eval(javascript);
+                    ((Invocable) engine).getInterface(ScriptModule.class).register();
+                }
+            }
+        } catch (IOException | ScriptException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
         TitanBot.getLogger().info("Registered all modules (count=" + TitanBot.MODULES.size() + ").");
     }

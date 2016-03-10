@@ -1,6 +1,6 @@
 # TitanBot #
 
-An IRC bot developed for the moparisthebest community using Java 8 and Maven.
+An IRC bot developed for the moparisthebest community using Java 8 and Maven. Modules are created using JavaScript or CoffeeScript depending on the developer's preference.
 
 ## Modules
 * Weather

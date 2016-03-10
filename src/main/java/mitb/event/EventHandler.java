@@ -3,6 +3,8 @@ package mitb.event;
 import mitb.util.PIrcBotXHelper;
 import mitb.util.Properties;
 
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,7 @@ public final class EventHandler {
     /**
      * Event listeners.
      */
-    private static final Map<Object, Map<Method, Class<? extends Event>>> eventListeners = new HashMap<>();
+    private static final Map<Object, Map<String, Class<? extends Event>>> eventListeners = new HashMap<>();
 
     /**
      * Register some event handlers with the event bus.
@@ -27,14 +29,30 @@ public final class EventHandler {
         if (EventHandler.eventListeners.containsKey(o)) {
             return;
         }
-        HashMap<Method, Class<? extends Event>> list = new HashMap<>();
+        HashMap<String, Class<? extends Event>> list = new HashMap<>();
 
         for (Method method : o.getClass().getMethods()) {
             if (method.isAnnotationPresent(Listener.class)) {
-                list.put(method, (Class<? extends Event>) method.getParameterTypes()[0]);
+                list.put(method.getName(), (Class<? extends Event>) method.getParameterTypes()[0]);
             }
         }
         EventHandler.eventListeners.put(o, list);
+    }
+
+    /**
+     * Register an event handler with the event bus.
+     *
+     * @param engine object to register the event of
+     */
+    public static void register(ScriptEngine engine, String methodName, Class<? extends Event> event) {
+        if (EventHandler.eventListeners.containsKey(engine)) {
+            EventHandler.eventListeners.get(engine).put(methodName, event);
+            return;
+        }
+
+        HashMap<String, Class<? extends Event>> list = new HashMap<>();
+        list.put(methodName, event);
+        EventHandler.eventListeners.put(engine, list);
     }
 
     /**
@@ -55,11 +73,16 @@ public final class EventHandler {
 
         // Attempt trigger
         EventHandler.eventListeners.entrySet().stream().forEach(entry -> {
-            Map<Method, Class<? extends Event>> events = entry.getValue();
+            Map<String, Class<? extends Event>> events = entry.getValue();
 
             events.entrySet().stream().filter(e -> e.getValue().isInstance(event)).forEach(e -> {
                 try {
-                    e.getKey().invoke(entry.getKey(), event);
+                    if (entry.getKey() instanceof ScriptEngine) {
+                        Invocable engine = (Invocable) entry.getKey();
+                        engine.invokeFunction(e.getKey(), event);
+                    } else {
+                        entry.getKey().getClass().getMethod(e.getKey(), event.getClass()).invoke(entry.getKey(), event);
+                    }
                 } catch(Exception e1) {
                     e1.printStackTrace();
                 }
