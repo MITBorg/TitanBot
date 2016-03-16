@@ -48,7 +48,7 @@ public final class MemoModule extends CommandModule {
         }
 
         // Parsing command
-        String callerNick = callerUser.getNick();
+        String callerNick = callerUser.getNick().toLowerCase();
 
         // Invalid caller/source event
         if (callerNick == null) {
