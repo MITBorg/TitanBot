@@ -121,6 +121,7 @@ public final class MemoModule extends CommandModule {
             );
             statement.setString(1, callerNick);
             statement.executeUpdate();
+            TitanBot.sendReply(event.getSource(), "Successfully cleared all pending memos for you.");
         } catch(SQLException e) {
             TitanBot.getLogger().error("There was an error while deleting a memo.", e);
         }
