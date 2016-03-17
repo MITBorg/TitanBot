@@ -51,7 +51,7 @@ public final class YoutubeLookupModule extends Module {
 
     @Override
     protected void register() {
-        EventHandler.register(this);
+        // TODO: EventHandler.register(this);
     }
 
     @Listener

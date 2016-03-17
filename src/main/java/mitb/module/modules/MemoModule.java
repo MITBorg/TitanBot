@@ -31,7 +31,7 @@ public final class MemoModule extends CommandModule {
     public void getHelp(CommandEvent event) {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " add (target_nick) (msg) | "
                 + event.getArgs()[0] + " view (sender_nick) | "  + event.getArgs()[0]
-                + " pending | Note: You must be using a verified IRC nickname to use this module.");
+                + " pending | clear | Note: You must be using a verified IRC nickname to use this module.");
     }
 
     @Override
@@ -70,6 +70,8 @@ public final class MemoModule extends CommandModule {
             this.viewMessage(commandEvent, callerNick);
         } else if (cmd.equals("pending")) { // Seeing pending messages
             this.viewPending(commandEvent, callerNick);
+        } else if (cmd.equals("clear")) {
+            this.clearPending(commandEvent, callerNick);
         }
     }
 
@@ -103,6 +105,24 @@ public final class MemoModule extends CommandModule {
             MemoModule.deleteMessage(senderNick, callerNick);
         } else {
             TitanBot.sendReply(event.getSource(), "There is no message for you from: " + senderNick);
+        }
+    }
+
+    /**
+     * Delete all pending memos for a user
+     *
+     * @param event command event triggering this method call
+     * @param callerNick nick of the person calling this method
+     */
+    private void clearPending(CommandEvent event,  String callerNick) {
+        try {
+            PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
+                    "DELETE FROM memo WHERE target_nick = ?"
+            );
+            statement.setString(1, callerNick);
+            statement.executeUpdate();
+        } catch(SQLException e) {
+            TitanBot.getLogger().error("There was an error while deleting a memo.", e);
         }
     }
 
