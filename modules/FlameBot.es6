@@ -1,4 +1,4 @@
-class TitanBot {
+class FlameBot {
     register() {
         helper.register(engine, 'onJoin', Java.type('mitb.event.events.JoinEvent'));
     }
@@ -18,4 +18,4 @@ class TitanBot {
     }
 }
 
-export default new TitanBot()
+export default new FlameBot()
