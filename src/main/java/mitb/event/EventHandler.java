@@ -79,7 +79,7 @@ public final class EventHandler {
                 try {
                     if (entry.getKey() instanceof ScriptEngine) {
                         Invocable engine = (Invocable) entry.getKey();
-                        engine.invokeFunction(e.getKey(), event);
+                        engine.invokeMethod(((ScriptEngine) entry.getKey()).eval("exports.default"), e.getKey(), event);
                     } else {
                         entry.getKey().getClass().getMethod(e.getKey(), event.getClass()).invoke(entry.getKey(), event);
                     }

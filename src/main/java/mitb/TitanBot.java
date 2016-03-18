@@ -14,6 +14,7 @@ import mitb.module.modules.youtube.YoutubeLookupModule;
 import mitb.util.Properties;
 import mitb.util.ScriptingHelper;
 import mitb.util.StringHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
@@ -25,7 +26,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLSocketFactory;
 import javax.script.*;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -215,27 +218,31 @@ public final class TitanBot {
         Bindings bindings = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
         bindings.put("helper", new ScriptingHelper());
 
-        engine.eval(new String(Files.readAllBytes(Paths.get("lib/coffeescript.js"))));
-        Invocable invocable = (Invocable) engine;
-        Object coffeeScript = engine.eval("CoffeeScript");
+        engine.eval(new String(Files.readAllBytes(Paths.get("lib/babel-standalone.js")), StandardCharsets.UTF_8));
+        ScriptEngine babelEngine = engine;
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get("modules"))) {
             for (Path p : stream) {
                 engine = engineManager.getEngineByName("nashorn");
                 engine.getBindings(ScriptContext.ENGINE_SCOPE).put("engine", engine);
+                engine.getBindings(ScriptContext.ENGINE_SCOPE).put("exports", ((Invocable) engine).invokeMethod(
+                        engine.eval("JSON"), "parse", "{}"));
 
                 if (p.toString().endsWith(".js")) {
                     engine.eval(Files.newBufferedReader(p));
-                    ((Invocable) engine).getInterface(ScriptModule.class).register();
-                } else if (p.toString().endsWith(".coffee")) {
-                    String source = new String(Files.readAllBytes((p)));
-                    Object json = ((Invocable) engine).invokeMethod(engine.eval("JSON"), "parse", "{\"bare\": true}");
-                    String javascript = (String) invocable.invokeMethod(coffeeScript, "compile", source, json);
-                    engine.eval(javascript);
-                    ((Invocable) engine).getInterface(ScriptModule.class).register();
+                } else if (p.toString().endsWith(".es6")) {
+                    String source = new String(Files.readAllBytes(p));
+                    babelEngine.getBindings(ScriptContext.ENGINE_SCOPE).put("source", source);
+                    String transform = (String) babelEngine.eval("Babel.transform(source, {presets: ['es2015']}).code");
+                    engine.eval(transform);
                 }
+
+                Object clazz = engine.eval("exports.default");
+                ((Invocable) engine).invokeMethod(clazz, "register");
             }
-        } catch (IOException | ScriptException | NoSuchMethodException e) {
+        } catch (IOException | ScriptException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
 
