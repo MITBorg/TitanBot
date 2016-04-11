@@ -1,10 +1,15 @@
 package mitb;
 
 import com.google.common.util.concurrent.RateLimiter;
+import com.sun.corba.se.spi.ior.ObjectKey;
+import jdk.nashorn.api.scripting.JSObject;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import mitb.command.CommandHandler;
 import mitb.event.EventHandler;
 import mitb.irc.IRCListener;
+import mitb.module.JSModule;
 import mitb.module.Module;
+import mitb.module.ScriptCommandModule;
 import mitb.module.ScriptModule;
 import mitb.module.modules.*;
 import mitb.module.modules.googsearch.GoogleSearchModule;
@@ -15,6 +20,9 @@ import mitb.util.Properties;
 import mitb.util.ScriptingHelper;
 import mitb.util.StringHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.core.util.KeyValuePair;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
@@ -28,6 +36,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.script.*;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -37,7 +47,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Main class for TitanBot. Handles the main functionality of the bot.
@@ -45,6 +57,7 @@ import java.util.List;
 public final class TitanBot {
 
     public static final List<Module> MODULES = new ArrayList<>();
+    public static final List<ScriptModule> SCRIPT_MODULES = new ArrayList<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(TitanBot.class);
     private static final RateLimiter RATE_LIMITER = RateLimiter.create(Properties.getValueAsDouble("rate"));
     private static Connection databaseConnection;
@@ -201,15 +214,13 @@ public final class TitanBot {
         TitanBot.MODULES.add(new StatsModule());
         TitanBot.MODULES.add(new UrbanDictionaryModule());
         TitanBot.MODULES.add(new HelpModule());
-        TitanBot.MODULES.add(new SedReplacementModule());
         TitanBot.MODULES.add(new WeatherModule());
         TitanBot.MODULES.add(new MemoModule());
         TitanBot.MODULES.add(new GoogleSearchModule());
         TitanBot.MODULES.add(new QuotesModule());
         TitanBot.MODULES.add(new WolframEvaluationModule());
         TitanBot.MODULES.add(new AzGameModule());
-        TitanBot.MODULES.add(new RepoModule());
-        TitanBot.MODULES.add(new HangmanGameModule());
+        //TitanBot.MODULES.add(new HangmanGameModule());
         TitanBot.MODULES.add(new YoutubeLookupModule());
 
         ScriptEngineManager engineManager = new ScriptEngineManager();
@@ -237,16 +248,28 @@ public final class TitanBot {
                     engine.eval(transform);
                 }
 
-                Object clazz = engine.eval("exports.default");
-                ((Invocable) engine).invokeMethod(clazz, "register");
+                ScriptObjectMirror clazz = (ScriptObjectMirror) engine.eval("exports.default");
+                ScriptModule obj;
+
+                try {
+                    String[] commands = (String[]) ((Invocable) engine).invokeMethod(clazz, "getCommands");
+                    obj = new JSModule((Invocable) engine, clazz).commandProxy();
+                    CommandHandler.register((ScriptCommandModule) obj, commands);
+                } catch (NoSuchMethodException e) {
+                    obj = new JSModule((Invocable) engine, clazz).proxy();
+                }
+
+                obj.register();
+                TitanBot.SCRIPT_MODULES.add(obj);
             }
         } catch (IOException | ScriptException e) {
-            e.printStackTrace();
+            TitanBot.LOGGER.error("Error when opening or executing script.", e);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            TitanBot.LOGGER.error("Error when registering new script.", e);
         }
 
-        TitanBot.getLogger().info("Registered all modules (count=" + TitanBot.MODULES.size() + ").");
+        TitanBot.getLogger().info("Registered all modules (count=" + (TitanBot.MODULES.size() + TitanBot
+                .SCRIPT_MODULES.size()) + ").");
     }
 
     /**

@@ -186,7 +186,7 @@ public final class HangmanGameModule extends CommandModule {
     }
 
     @Override
-    protected void register() {
+    public void register() {
         EventHandler.register(this);
     }
 

@@ -197,7 +197,7 @@ public final class MemoModule extends CommandModule {
     }
 
     @Override
-    protected void register() {
+    public void register() {
         EventHandler.register(this);
     }
 

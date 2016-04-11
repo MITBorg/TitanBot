@@ -50,7 +50,7 @@ public final class YoutubeLookupModule extends Module {
             .expireAfterAccess(10, TimeUnit.MINUTES).build();
 
     @Override
-    protected void register() {
+    public void register() {
         // TODO: EventHandler.register(this);
     }
 
