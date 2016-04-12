@@ -12,7 +12,7 @@ class Repo {
     }
 
     onCommand(commandEvent) {
-        commandEvent.getSource().respond('https://github.com/MoparScape/TitanBot');
+        helper.respond(commandEvent, 'https://github.com/MoparScape/TitanBot');
     }
 }
 

@@ -12,7 +12,6 @@ import mitb.event.events.CommandEvent;
 import mitb.module.CommandModule;
 import mitb.module.modules.googsearch.json.GoogleSearchQuery;
 import mitb.module.modules.googsearch.json.Result;
-import mitb.module.modules.urbandict.UrbanDictionaryModule;
 import mitb.util.StringHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.examples.HtmlToPlainText;
@@ -57,24 +56,25 @@ public final class GoogleSearchModule extends CommandModule {
      */
     @Override
     public void onCommand(CommandEvent commandEvent) {
-        if (commandEvent.getArgs().length == 0) {
+        /*if (commandEvent.getArgs().length == 0) {
             return;
         }
 
         // Checking if we want a custom definition
-        UrbanDictionaryModule.EntryValuePair entryValue = UrbanDictionaryModule.getEntryValues(commandEvent);
-        final int finalEntryNo = entryValue.getEntryNumber();
+        //UrbanDictionaryModule.EntryValuePair entryValue = UrbanDictionaryModule.getEntryValues(commandEvent);
+        //final int finalEntryNo = entryValue.getEntryNumber();
 
         // Validating entry number
-        if (finalEntryNo < 0) {
+        //if (finalEntryNo < 0) {
             TitanBot.sendReply(commandEvent.getSource(), "Invalid definition number.");
             return;
-        }
+        //}
 
         // Constructing query
-        String[] args = entryValue.isCustomEntry() ? Arrays.copyOfRange(commandEvent.getArgs(), 1, commandEvent.getArgs().length)
-                : commandEvent.getArgs();
-        String query = Joiner.on(" ").join(args);
+        //String[] args = entryValue.isCustomEntry() ? Arrays.copyOfRange(commandEvent.getArgs(), 1, commandEvent
+        //        .getArgs().length)
+        //        : commandEvent.getArgs();
+        //String query = Joiner.on(" ").join(args);
 
         // Check cache
         String result = GoogleSearchModule.CACHE.getIfPresent(query);
@@ -130,7 +130,7 @@ public final class GoogleSearchModule extends CommandModule {
                             // XXX output error
                         }
                     });
-        }
+        }*/
     }
 
     private static String formatResponse(List<Result> results, int entryNo) {
