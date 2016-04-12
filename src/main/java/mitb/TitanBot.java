@@ -78,18 +78,40 @@ public final class TitanBot {
      * @param event event we should reply to
      * @param reply message we should send.
      */
+    public static void sendReply(GenericEvent event, String reply, String truncatedText) {
+        TitanBot.sendReply(event, reply, truncatedText, false);
+    }
+
+    /**
+     * Send a rate-limited reply to the channel
+     *
+     * @param event event we should reply to
+     * @param reply message we should send.
+     */
     public static void sendReply(GenericEvent event, String reply) {
         TitanBot.sendReply(event, reply, "");
     }
 
     /**
-     * Send a rate-limited reply to the channel with a suffix if it is truncated to 3 lines.
+     * Send a reply to the channel
      *
      * @param event event we should reply to
      * @param reply message we should send.
+     * @param ignoreRate should we ignore the rate limit
      */
-    public static void sendReply(GenericEvent event, String reply, String truncatedText) {
-        if (TitanBot.RATE_LIMITER.tryAcquire()) {
+    public static void sendReply(GenericEvent event, String reply, boolean ignoreRate) {
+        TitanBot.sendReply(event, reply, "", ignoreRate);
+    }
+
+    /**
+     * Send a reply to the channel with a suffix if it is truncated to 3 lines.
+     *
+     * @param event event we should reply to
+     * @param reply message we should send.
+     * @param ignoreRate should we ignore the rate limit
+     */
+    public static void sendReply(GenericEvent event, String reply, String truncatedText, boolean ignoreRate) {
+        if (ignoreRate || !(event instanceof MessageEvent) || TitanBot.RATE_LIMITER.tryAcquire()) {
             if (event instanceof MessageEvent) {
                 MessageEvent messageEvent = (MessageEvent) event;
 

@@ -18,4 +18,8 @@ public class ScriptingHelper {
     public void respond(ProxyEvent event, String msg, String suffix) {
         TitanBot.sendReply(event.getSource(), msg, suffix);
     }
+
+    public void respond(ProxyEvent event, String msg, boolean ignoreRate) {
+        TitanBot.sendReply(event.getSource(), msg, ignoreRate);
+    }
 }
