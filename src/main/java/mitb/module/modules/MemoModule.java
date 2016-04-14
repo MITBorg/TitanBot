@@ -82,6 +82,7 @@ public final class MemoModule extends CommandModule {
      * @param callerNick nick of the person calling this method
      */
     private void viewPending(CommandEvent event, String callerNick) {
+        callerNick = callerNick.toLowerCase();
         String msg = MemoModule.getPendingMessageSenders(MemoModule.getMessageSenders(callerNick));
 
         // Reply
@@ -97,6 +98,7 @@ public final class MemoModule extends CommandModule {
      */
     private void viewMessage(CommandEvent event, String callerNick) {
         String senderNick = event.getArgs()[1].toLowerCase();
+        callerNick = callerNick.toLowerCase();
         String memoMessage = MemoModule.getMessage(senderNick, callerNick);
 
         // Attempting to view message
@@ -114,8 +116,10 @@ public final class MemoModule extends CommandModule {
      * @param event command event triggering this method call
      * @param callerNick nick of the person calling this method
      */
-    private void clearPending(CommandEvent event,  String callerNick) {
+    private void clearPending(CommandEvent event, String callerNick) {
         try {
+            callerNick = callerNick.toLowerCase();
+
             PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "DELETE FROM memo WHERE target_nick = ?"
             );
@@ -135,6 +139,7 @@ public final class MemoModule extends CommandModule {
      */
     private void addMessage(CommandEvent event, String callerNick) {
         String targetNick = event.getArgs()[1].toLowerCase();
+        callerNick = callerNick.toLowerCase();
         String msg = Joiner.on(" ").join(Arrays.copyOfRange(event.getArgs(), 2, event.getArgs().length));
 
         // Ensuring length is valid
@@ -210,6 +215,9 @@ public final class MemoModule extends CommandModule {
      */
     private static void updateMessage(String fromNick, String targetNick, String message) {
         try {
+            fromNick = fromNick.toLowerCase();
+            targetNick = targetNick.toLowerCase();
+
             PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "INSERT OR REPLACE INTO memo (id, target_nick, sender_nick, message) VALUES ((SELECT id FROM memo WHERE target_nick = ? AND sender_nick = ?), ?, ?, ?)"
             );
@@ -232,6 +240,9 @@ public final class MemoModule extends CommandModule {
      */
     private static void deleteMessage(String senderNick, String targetNick) {
         try {
+            senderNick = senderNick.toLowerCase();
+            targetNick = targetNick.toLowerCase();
+
             PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "DELETE FROM memo WHERE target_nick = ? AND sender_nick = ?"
             );
@@ -251,6 +262,9 @@ public final class MemoModule extends CommandModule {
      */
     private static String getMessage(String senderNick, String targetNick) {
         try {
+            senderNick = senderNick.toLowerCase();
+            targetNick = targetNick.toLowerCase();
+
             PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "SELECT message FROM memo WHERE sender_nick = ? AND target_nick = ?"
             );
@@ -272,6 +286,8 @@ public final class MemoModule extends CommandModule {
     private static List<String> getMessageSenders(String targetNick) {
         try {
             List<String> l = new ArrayList<>();
+
+            targetNick = targetNick.toLowerCase();
 
             PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
                     "SELECT sender_nick FROM memo WHERE target_nick = ?"
