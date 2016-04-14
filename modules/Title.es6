@@ -27,9 +27,6 @@ class Title {
 
         var query = `select * from yql.query.multi where queries="${queries}"`;
 
-        print(query);
-        print(`https://query.yahooapis.com/v1/public/yql?q=${encodeURIComponent(query)}&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys`);
-
         asyncHttpClient.prepareGet(`https://query.yahooapis.com/v1/public/yql?q=${encodeURIComponent(query)}&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys`)
             .execute(new com.ning.http.client.AsyncCompletionHandler({
                 onCompleted: (response) => {
@@ -48,7 +45,7 @@ class Title {
                         if (obj == null) {
                             msg += Java.type('mitb.util.StringHelper').wrapItalic('Unable to get title. Site down?');
                         } else {
-                            msg += Java.type('mitb.util.StringHelper').wrapBold(obj.title);
+                            msg += Java.type('mitb.util.StringHelper').wrapBold((typeof obj.title == 'string') ? obj.title : obj.title.content);
                         }
 
                         if (results.length > 1 && i < json.results.results.length - 1) {
@@ -56,7 +53,6 @@ class Title {
                         }
                     }
 
-                    print(msg);
                     event.getSource().respondWith(msg);
                 },
                 onThrowable: (t) => {}
