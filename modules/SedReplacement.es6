@@ -63,4 +63,4 @@ class SedReplacement {
     }
 }
 
-export default new SedReplacement()
+export default new SedReplacement();

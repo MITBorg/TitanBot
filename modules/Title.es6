@@ -42,16 +42,18 @@ class Title {
                         results = [results];
 
                     _(results).each((obj, i) => {
-                        if (obj == null) {
+                        if (obj == null && results.length > 1) {
                             msg += Java.type('mitb.util.StringHelper').wrapItalic('Unable to get title. Site down?');
                         } else {
-                            msg += Java.type('mitb.util.StringHelper').wrapBold(_.isString(obj.title) ? obj.title : obj.title.content);
+                            msg += Java.type('mitb.util.StringHelper').wrapBold((_.isString(obj.title) ? obj.title : obj.title.content).trim());
                         }
 
                         if (results.length > 1 && i < json.results.results.length - 1) {
                             msg += ' | ';
                         }
                     });
+
+                    if (msg == 'Linked: ') return;
 
                     event.getSource().respondWith(msg);
                 },

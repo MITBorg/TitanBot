@@ -11,6 +11,7 @@ urbandict.api_key=NONE
 wolfram.api_key=NONE
 weather.api_key=NONE
 google.api_key=NONE
+computer_vision.api_key=NONE
 games.restrict_channel=NO
 games.wordlist=src/main/resources/wordlist.txt
 ignore_nicks=NONE
