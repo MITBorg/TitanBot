@@ -13,4 +13,10 @@ public interface ScriptModule {
      * @param event
      */
     void getHelp(CommandEvent event);
+
+    /**
+     * Get a clean name of this module.
+     * @return name
+     */
+    String getName();
 }

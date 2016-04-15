@@ -49,6 +49,11 @@ public final class GoogleSearchModule extends CommandModule {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " [term #] (query)");
     }
 
+    @Override
+    public String getName() {
+        return "Google";
+    }
+
     /**
      * Reply with an example response on command.
      *

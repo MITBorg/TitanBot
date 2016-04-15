@@ -59,6 +59,11 @@ public final class WeatherModule extends CommandModule {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " (location)");
     }
 
+    @Override
+    public String getName() {
+        return "Weather";
+    }
+
     /**
      * Reply with an example response on command.
      *

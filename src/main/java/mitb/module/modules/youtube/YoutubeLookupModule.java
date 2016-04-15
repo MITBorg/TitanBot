@@ -148,4 +148,9 @@ public final class YoutubeLookupModule extends Module {
     public void getHelp(CommandEvent event) {
         TitanBot.sendReply(event.getSource(), "Displays youtube link information when a link is captured in an active channel.");
     }
+
+    @Override
+    public String getName() {
+        return "Youtube";
+    }
 }

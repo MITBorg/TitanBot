@@ -15,6 +15,7 @@ import mitb.module.modules.youtube.YoutubeLookupModule;
 import mitb.util.Properties;
 import mitb.util.ScriptingHelper;
 import mitb.util.StringHelper;
+import org.apache.commons.io.FilenameUtils;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
@@ -257,10 +258,10 @@ public final class TitanBot {
 
                 try {
                     String[] commands = (String[]) ((Invocable) engine).invokeMethod(clazz, "getCommands");
-                    obj = new JSModule((Invocable) engine, clazz).commandProxy();
+                    obj = new JSModule((Invocable) engine, clazz, FilenameUtils.getBaseName(p.toString())).commandProxy();
                     CommandHandler.register((ScriptCommandModule) obj, commands);
                 } catch (NoSuchMethodException e) {
-                    obj = new JSModule((Invocable) engine, clazz).proxy();
+                    obj = new JSModule((Invocable) engine, clazz, FilenameUtils.getBaseName(p.toString())).proxy();
                 }
 
                 TitanBot.MODULES.add(obj);

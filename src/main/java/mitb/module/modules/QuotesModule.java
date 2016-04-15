@@ -26,6 +26,11 @@ public final class QuotesModule extends CommandModule {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " add (quote) | " + event.getArgs()[0]+ " view (number)");
     }
 
+    @Override
+    public String getName() {
+        return "Quotes";
+    }
+
     /**
      * Reply with an example response on command.
      *

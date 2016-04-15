@@ -75,6 +75,11 @@ public final class WolframEvaluationModule extends CommandModule {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " (query)");
     }
 
+    @Override
+    public String getName() {
+        return "Wolfram";
+    }
+
     /**
      * Reply with an example response on command.
      *

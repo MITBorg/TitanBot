@@ -35,6 +35,11 @@ public final class MemoModule extends CommandModule {
     }
 
     @Override
+    public String getName() {
+        return "Memo";
+    }
+
+    @Override
     public void onCommand(CommandEvent commandEvent) {
         if (commandEvent.getArgs().length == 0) {
             return;

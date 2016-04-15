@@ -30,6 +30,11 @@ public final class LastSeenModule extends CommandModule {
         TitanBot.sendReply(event.getSource(), "Syntax: " + event.getArgs()[0] + " (nick)");
     }
 
+    @Override
+    public String getName() {
+        return "LastSeen";
+    }
+
     /**
      * Check when the specified person last spoke and return with a response.
      */

@@ -198,6 +198,11 @@ public final class HangmanGameModule extends CommandModule {
                 .RESTRICTED_CHANNEL));
     }
 
+    @Override
+    public String getName() {
+        return "Hangman";
+    }
+
     /**
      * If this module is allowed to start game sessions in the given channel.
      * @param channelName

@@ -49,6 +49,11 @@ public final class AzGameModule extends CommandModule {
                 .RESTRICTED_CHANNEL));
     }
 
+    @Override
+    public String getName() {
+        return "Az";
+    }
+
     /**
      * Reply with an example response on command.
      *

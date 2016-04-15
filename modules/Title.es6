@@ -1,3 +1,5 @@
+load('lib/lodash.js');
+
 class Title {
     register() {
         helper.register(engine, 'onMessage', Java.type('mitb.event.events.MessageEvent'));
@@ -36,22 +38,20 @@ class Title {
 
                     var results = json.results.results;
 
-                    if (!Array.isArray(results))
+                    if (!_.isArray(results))
                         results = [results];
 
-                    for (var i = 0; i < results.length; i++) {
-                        var obj = results[i];
-
+                    _(results).each((obj, i) => {
                         if (obj == null) {
                             msg += Java.type('mitb.util.StringHelper').wrapItalic('Unable to get title. Site down?');
                         } else {
-                            msg += Java.type('mitb.util.StringHelper').wrapBold((typeof obj.title == 'string') ? obj.title : obj.title.content);
+                            msg += Java.type('mitb.util.StringHelper').wrapBold(_.isString(obj.title) ? obj.title : obj.title.content);
                         }
 
                         if (results.length > 1 && i < json.results.results.length - 1) {
                             msg += ' | ';
                         }
-                    }
+                    });
 
                     event.getSource().respondWith(msg);
                 },

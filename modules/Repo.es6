@@ -1,6 +1,5 @@
 class Repo {
     register() {
-
     }
 
     getHelp(event) {

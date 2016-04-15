@@ -2,7 +2,6 @@ load('lib/lodash.js');
 
 class Help {
     register() {
-
     }
 
     getHelp(event) {
@@ -14,41 +13,34 @@ class Help {
     }
 
     onCommand(commandEvent) {
-        if (commandEvent.getArgs().length) {
+        if (commandEvent.getArgs().length)
             this.sendModuleHelp(commandEvent);
-        } else {
+        else
             this.sendModuleList(commandEvent);
-        }
     }
 
     sendModuleHelp(commandEvent) {
-        var moduleName = commandEvent.getArgs()[0].toLowerCase();
+        var moduleName = _.camelCase(Java.type('com.google.common.base.Joiner').on(' ').join(commandEvent.getArgs()).trim()).toLowerCase();
 
         _.each(Java.type('mitb.TitanBot').MODULES, (module) => {
             if (module instanceof Java.type('mitb.module.ScriptCommandModule')) {
-                if (_.some(module.getCommands(), (value) => value === moduleName)) {
+                if (_.includes(module.getCommands(), moduleName)) {
                     module.getHelp(commandEvent);
                     return;
                 }
-            } else {
-                var className = module.getClass().getSimpleName();
-                if (className.substr(0, className.lastIndexOf("Module")).toLowerCase() === moduleName) {
-                    module.getHelp(commandEvent);
-                    return;
-                }
+            } else if (_.camelCase(module.getName()).toLowerCase() === moduleName) {
+                module.getHelp(commandEvent);
+                return;
             }
         });
     }
 
     sendModuleList(commandEvent) {
         var modules = _.map(Java.type('mitb.TitanBot').MODULES, (module) => {
-            print(module.getClass().getSimpleName());
-
             if (module instanceof Java.type('mitb.module.ScriptCommandModule')) {
                 return module.getCommands()[0];
             } else {
-                var className = module.getClass().getSimpleName();
-                return className.substr(0, className.lastIndexOf("Module")).toLowerCase();
+                return _.camelCase(module.getName().toLowerCase());
             }
         }).join(' ');
 
