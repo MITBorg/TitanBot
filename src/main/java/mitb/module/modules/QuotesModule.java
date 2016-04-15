@@ -124,7 +124,7 @@ public final class QuotesModule extends CommandModule {
     private void insertQuote(String creatorNick, String quote) {
         try {
             PreparedStatement statement = TitanBot.getDatabaseConnection().prepareStatement(
-                    "INSERT INTO quotes (id, creator_nick, quote) VALUES (NULL, ?, ?)"
+                    "INSERT INTO quotes (creator_nick, quote) VALUES (?, ?)"
             );
             statement.setString(1, creatorNick);
             statement.setString(2, quote);

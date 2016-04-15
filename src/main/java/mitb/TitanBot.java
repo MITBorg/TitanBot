@@ -282,10 +282,25 @@ public final class TitanBot {
     private void createTables() {
         try {
             Statement stmt = TitanBot.databaseConnection.createStatement();
-            stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), login VARCHAR(50), seen DATETIME)");
-            stmt.execute("CREATE TABLE weather (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), location VARCHAR(50))");
-            stmt.execute("CREATE TABLE memo (id INTEGER PRIMARY KEY AUTOINCREMENT, target_nick VARCHAR(50), sender_nick VARCHAR(50), message VARCHAR(250))");
-            stmt.execute("CREATE TABLE quotes (id INTEGER PRIMARY KEY AUTOINCREMENT, creator_nick VARCHAR(50), quote VARCHAR(350))");
+
+            try {
+                stmt.execute("CREATE TABLE seen (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), login VARCHAR(50), seen DATETIME)");
+            } catch(Exception ignored) {}
+
+            try {
+                stmt.execute("CREATE TABLE weather (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), location " +
+                        "VARCHAR(50))");
+            } catch(Exception ignored) {}
+
+            try {
+                stmt.execute("CREATE TABLE memo (id INTEGER PRIMARY KEY AUTOINCREMENT, target_nick VARCHAR(50), " +
+                        "sender_nick VARCHAR(50), message VARCHAR(250))");
+            } catch(Exception ignored) {}
+
+            try {
+                stmt.execute("CREATE TABLE quotes (id INTEGER PRIMARY KEY AUTOINCREMENT, creator_nick VARCHAR(50), " +
+                        "quote VARCHAR(350))");
+            } catch(Exception ignored) {}
         } catch(Exception ignored) {}
     }
 }
