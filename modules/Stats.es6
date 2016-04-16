@@ -1,4 +1,3 @@
-load('lib/humanized_time_span.js');
 load('lib/moment.js');
 
 class Stats {
