@@ -17,19 +17,33 @@ class LastFM {
     }
 
     onCommand(commandEvent) {
-        if (commandEvent.getArgs().length < 2)
+        var args = Java.from(commandEvent.getArgs());
+
+        var callerNick = Java.type('mitb.util.PIrcBotXHelper').getNick(commandEvent.getSource());
+
+        var cachedUsername = this.fetchCachedUsername(callerNick);
+
+        if (cachedUsername && args.length < 2)
+            args.unshift(cachedUsername);
+        else if (args.length > 0)
+            this.updateCachedUsername(callerNick, args[0]);
+
+        if (args.length == 1)
+            args.push('current');
+
+        if (args.length < 2)
             return;
 
         var AsyncHttpClient = Java.type('com.ning.http.client.AsyncHttpClient');
         var Properties = Java.type('mitb.util.Properties');
         var StringHelper = Java.type('mitb.util.StringHelper');
 
-        var user = commandEvent.getArgs()[0];
+        var user = args[0];
         var asyncHttpClient = new AsyncHttpClient();
         var template = null;
         var url = null;
 
-        switch (commandEvent.getArgs()[1].toLowerCase()) {
+        switch (args[1].toLowerCase()) {
             case 'info':
             case 'plays':
             case 'stats':
@@ -46,10 +60,10 @@ class LastFM {
             case 'recent':
                 var amt;
 
-                if (commandEvent.getArgs().length < 3) {
+                if (args.length < 3) {
                     amt = 1;
-                } else if(!isNaN(commandEvent.getArgs()[2]) && isFinite(commandEvent.getArgs()[2])) {
-                    amt = commandEvent.getArgs()[2];
+                } else if(!isNaN(args[2]) && isFinite(args[2])) {
+                    amt = args[2];
 
                     if (amt < 1)
                         return;
@@ -83,10 +97,10 @@ class LastFM {
             case 'topsongs':
                 var time;
 
-                if (commandEvent.getArgs().length < 3) {
+                if (args.length < 3) {
                     time = 'overall';
                 } else {
-                    time = commandEvent.getArgs()[2].toLowerCase();
+                    time = args[2].toLowerCase();
 
                     if (time != '7day' && time != '1month' && time != '3month' && time != '6month' && time != '12month')
                         time = 'overall';
@@ -97,7 +111,7 @@ class LastFM {
                     var loop = [];
                     var fmt = (item) => `${StringHelper.wrapBold(item.name)} (${item.playcount})`;
 
-                    if (commandEvent.getArgs()[1].toLowerCase() == 'topartists') {
+                    if (args[1].toLowerCase() == 'topartists') {
                         if (!ret.topartists.artist[0]) return;
 
                         str = 'Top artists: ';
@@ -121,7 +135,7 @@ class LastFM {
                     return str;
                 };
 
-                url = `https://ws.audioscrobbler.com/2.0/?method=user.get${commandEvent.getArgs()[1].toLowerCase() == 'topartists' ? 'topartists' : 'toptracks'}&user=${user}&api_key=${Properties.getValue('lastfm.api_key')}&format=json&limit=5&period=${time}`;
+                url = `https://ws.audioscrobbler.com/2.0/?method=user.get${args[1].toLowerCase() == 'topartists' ? 'topartists' : 'toptracks'}&user=${user}&api_key=${Properties.getValue('lastfm.api_key')}&format=json&limit=5&period=${time}`;
                 break;
 
             default:
@@ -140,6 +154,29 @@ class LastFM {
                 },
                 onThrowable: (t) => {}
             }));
+    }
+
+    updateCachedUsername(nick, username) {
+        try {
+            var statement = Java.type('mitb.TitanBot').getDatabaseConnection().prepareStatement('INSERT OR REPLACE INTO lastfm (id, nick, username) VALUES ((SELECT id FROM lastfm WHERE nick = ?), ?, ?)');
+            statement.setString(1, nick);
+            statement.setString(2, nick);
+            statement.setString(3, username);
+            statement.executeUpdate();
+        } catch(e) {
+            e.printStackTrace();
+        }
+    }
+
+    fetchCachedUsername(nick) {
+        try {
+            var statement = Java.type('mitb.TitanBot').getDatabaseConnection().prepareStatement('SELECT username FROM lastfm WHERE nick = ?');
+            statement.setString(1, nick);
+            var resultSet = statement.executeQuery();
+            return resultSet.getString("username");
+        } catch (e) {
+            return null;
+        }
     }
 }
 

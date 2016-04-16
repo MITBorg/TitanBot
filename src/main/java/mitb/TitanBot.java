@@ -12,6 +12,7 @@ import mitb.module.modules.*;
 import mitb.module.modules.googsearch.GoogleSearchModule;
 import mitb.module.modules.weather.WeatherModule;
 import mitb.module.modules.youtube.YoutubeLookupModule;
+import mitb.util.PIrcBotXHelper;
 import mitb.util.Properties;
 import mitb.util.ScriptingHelper;
 import mitb.util.StringHelper;
@@ -289,6 +290,11 @@ public final class TitanBot {
 
             try {
                 stmt.execute("CREATE TABLE weather (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), location " +
+                        "VARCHAR(50))");
+            } catch(Exception ignored) {}
+
+            try {
+                stmt.execute("CREATE TABLE lastfm (id INTEGER PRIMARY KEY AUTOINCREMENT, nick VARCHAR(50), username " +
                         "VARCHAR(50))");
             } catch(Exception ignored) {}
 
