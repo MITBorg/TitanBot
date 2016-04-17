@@ -23,6 +23,8 @@ class SedReplacement {
 
         if (callerNick == null)
             return;
+        else
+            callerNick = callerNick.toLowerCase();
 
         var word = /^([a-zA-Z\[\]\\`_\^\{\|\}][a-zA-Z0-9\[\]\\`_\^\{\|\}-]{1,31})/;
 
