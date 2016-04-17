@@ -13,7 +13,8 @@ class SedReplacement {
     }
 
     onMessage(event) {
-        var msg = event.getSource().getMessage();
+        var originalMsg = event.getSource().getMessage();
+        var msg = originalMsg;
         var channel = event.getSource().getChannel().getName();
 
         var targeted = false;
@@ -47,7 +48,7 @@ class SedReplacement {
             if (!this.cache.hasOwnProperty(callerNick))
                 this.cache[callerNick] = {};
 
-            this.cache[callerNick][channel] = msg;
+            this.cache[callerNick][channel] = originalMsg;
             return;
         }
 
