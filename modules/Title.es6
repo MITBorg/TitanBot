@@ -42,19 +42,19 @@ class Title {
                     if (!_.isArray(results))
                         results = [results];
 
-                    _(results).each((obj, i) => {
-                        if (obj == null && results.length > 1) {
-                            msg += Java.type('mitb.util.StringHelper').wrapItalic('Unable to get title. Site down?');
-                        } else {
-                            msg += Java.type('mitb.util.StringHelper').wrapBold(he.decode((_.isString(obj.title) ? obj.title : obj.title.content).trim().replace(/(?:\r\n|\r|\n)/g, '')));
-                        }
+                    var sendMessage = false;
 
-                        if (results.length > 1 && i < json.results.results.length - 1) {
-                            msg += ' | ';
+                    _(results).each((obj, i) => {
+                        if (obj != null) {
+                            msg += Java.type('mitb.util.StringHelper').wrapBold(he.decode((_.isString(obj.title) ? obj.title : obj.title.content).trim().replace(/(?:\r\n|\r|\n)/g, '')));
+                            sendMessage = true;
+
+                            if (results.length > 1 && i < json.results.results.length - 1)
+                                msg += ' | ';
                         }
                     });
 
-                    if (msg == 'Linked: ') return;
+                    if (msg == 'Linked: ' || !sendMessage) return;
 
                     event.getSource().respondWith(msg);
                 },
