@@ -12,6 +12,7 @@ wolfram.api_key=NONE
 weather.api_key=NONE
 google.api_key=NONE
 computer_vision.api_key=NONE
+repo=MoparScape/TitanBot
 games.restrict_channel=NO
 games.wordlist=src/main/resources/wordlist.txt
 ignore_nicks=NONE

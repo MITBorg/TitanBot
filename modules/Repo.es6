@@ -11,7 +11,7 @@ class Repo {
     }
 
     onCommand(commandEvent) {
-        helper.respond(commandEvent, 'https://github.com/MoparScape/TitanBot');
+        helper.respond(commandEvent, `https://github.com/${Java.type('mitb.util.Properties').getValue('repo')}`);
     }
 }
 
