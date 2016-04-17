@@ -1,4 +1,4 @@
-load('lib/moment.js');
+import moment from 'moment';
 
 class Commit {
     register() {

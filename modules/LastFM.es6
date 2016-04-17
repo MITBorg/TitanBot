@@ -1,5 +1,5 @@
-load('lib/lodash.js');
-load('lib/moment.js');
+import _ from 'lodash';
+import moment from 'moment';
 
 class LastFM {
     constructor() {

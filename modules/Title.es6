@@ -1,4 +1,5 @@
-load('lib/lodash.js');
+import _ from 'lodash';
+import he from 'he';
 
 class Title {
     register() {
@@ -45,7 +46,7 @@ class Title {
                         if (obj == null && results.length > 1) {
                             msg += Java.type('mitb.util.StringHelper').wrapItalic('Unable to get title. Site down?');
                         } else {
-                            msg += Java.type('mitb.util.StringHelper').wrapBold((_.isString(obj.title) ? obj.title : obj.title.content).trim());
+                            msg += Java.type('mitb.util.StringHelper').wrapBold(he.decode((_.isString(obj.title) ? obj.title : obj.title.content).trim().replace(/(?:\r\n|\r|\n)/g, '')));
                         }
 
                         if (results.length > 1 && i < json.results.results.length - 1) {
@@ -57,7 +58,9 @@ class Title {
 
                     event.getSource().respondWith(msg);
                 },
-                onThrowable: (t) => {}
+                onThrowable: (t) => {
+                    t.printStackTrace();
+                }
             }));
     }
 }

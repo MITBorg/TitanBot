@@ -1,4 +1,4 @@
-load('lib/juration.js');
+import juration from 'juration';
 
 class Reminder {
     constructor() {
@@ -22,7 +22,7 @@ class Reminder {
         var args = Java.type('java.util.Arrays').copyOfRange(commandEvent.getArgs(), 1, commandEvent.getArgs().length);
 
         try {
-            var time = new Date().getTime() + (window.juration.parse(commandEvent.getArgs()[0]) * 1000);
+            var time = new Date().getTime() + (juration.parse(commandEvent.getArgs()[0]) * 1000);
             var Timer = Java.type("java.util.Timer");
 
             var timer = new Timer();

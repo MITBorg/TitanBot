@@ -1,22 +1,22 @@
 # TitanBot #
 
-An IRC bot developed for the moparisthebest community using Java 8 and Maven. Modules are created using JavaScript or CoffeeScript depending on the developer's preference.
+An IRC bot developed for the moparisthebest community using Java 8 and Maven. Modules are created using ES6. All of our code (excluding anything in the `lib` directory) is licensed under GPLv3.
 
 ## Modules
 * Weather
-* Urban Dictionary (Lookup)
+* Urban Dictionary
 * Last Seen
 * Memo
 * Sed Replacement
 * Stats
-* TestCommand
-* FlameBot
-* Google Search
 * Quotes
 * Wolfram Alpha (Evaluation)
 * A-Z (word guessing game given a range of two words)
-* Hangman (word guessing game)
-* Youtube (Lookup)
+* Latest Commit Retrieval
+* Content Identification (along with NSFW ident.)
+* Last.FM
+* Reminder
+* URL title retrieval
 * Help
 
 ## Third-party API Keys Required
@@ -24,9 +24,11 @@ An IRC bot developed for the moparisthebest community using Java 8 and Maven. Mo
 * [Weather API](http://openweathermap.org/)
 * [Wolfram Alpha API](http://products.wolframalpha.com/api/)
 * [Unofficial Urban Dictionary API](https://market.mashape.com/community/urban-dictionary)
+* [Microsoft Computer Vision API](https://www.microsoft.com/cognitive-services/en-us/computer-vision-api)
+* [Last.FM API](https://www.last.fm/api)
 
 ## Contributors
-* [PureCS](https://github.com/PureCS)
-* [Jordan D.](https://github.com/w4)
+* [w4](https://github.com/w4)
 * [bootnecklad](https://github.com/bootnecklad)
+* [PureCS](https://github.com/PureCS)
 * [dg36](https://github.com/dg36)

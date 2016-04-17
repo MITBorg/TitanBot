@@ -1,0 +1,20 @@
+{
+  "name": "titanbot",
+  "version": "2.0.0",
+  "description": "An IRC bot developed for the moparisthebest community using Java 8 and Maven. Modules are created using ES6.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MoparScape/TitanBot.git"
+  },
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/MoparScape/TitanBot/issues"
+  },
+  "homepage": "https://github.com/MoparScape/TitanBot#readme",
+  "dependencies": {
+    "he": "^1.0.0",
+    "juration": "0.0.1",
+    "lodash": "^4.11.1",
+    "moment": "^2.12.0"
+  }
+}

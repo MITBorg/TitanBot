@@ -1,4 +1,4 @@
-load('lib/lodash.js');
+import _ from 'lodash';
 
 class ContentIdentify {
     register() {
@@ -34,13 +34,11 @@ class ContentIdentify {
                     var msg = 'The image pasted ';
 
                     if (json.confidence >= 0.5)
-                        msg += 'is probably of ';
+                        msg += `is probably of ${json.text}. `;
                     else if (json.confidence >= 0.8)
-                        msg += 'is of ';
+                        msg += `is of ${json.text}. `;
                     else
-                        msg += 'might be of ';
-
-                    msg += `${json.text}.`;
+                        msg = '';
 
                     asyncHttpClient.preparePost('https://api.projectoxford.ai/vision/v1.0/analyze?visualFeatures=Adult')
                         .setBody(`{"url":"${img.replace('"', '%22')}"}`)
@@ -53,9 +51,10 @@ class ContentIdentify {
                                 if (!json) return;
 
                                 if (json.isAdultContent || json.isRacyContent)
-                                    msg += Java.type('mitb.util.StringHelper').wrapBold(` Warning: the image is ${Java.type('org.pircbotx.Colors').RED}NSFW${Java.type('org.pircbotx.Colors').NORMAL}.`);
+                                    msg += Java.type('mitb.util.StringHelper').wrapBold(`Warning: the image is ${Java.type('org.pircbotx.Colors').RED}NSFW${Java.type('org.pircbotx.Colors').NORMAL}.`);
 
-                                event.getSource().respondWith(msg);
+                                if (msg != '')
+                                    event.getSource().respondWith(msg);
                             },
                             onThrowable: (t) => {
                             }

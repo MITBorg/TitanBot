@@ -32,3 +32,4 @@ target/
 # Our app files
 database.db
 src/main/resources/props.properties
+node_modules

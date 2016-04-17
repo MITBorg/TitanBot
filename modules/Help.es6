@@ -1,4 +1,4 @@
-load('lib/lodash.js');
+import _ from 'lodash';
 
 class Help {
     register() {

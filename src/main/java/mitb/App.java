@@ -12,7 +12,7 @@ public final class App {
      * @param args
      */
     public static void main(String... args) throws Exception {
-        TitanBot.getLogger().info("TitanBot v" + Properties.getValue("bot.version"));
+        TitanBot.getLogger().info("TitanBot v" + TitanBot.VERSION);
         (new TitanBot()).run();
     }
 }

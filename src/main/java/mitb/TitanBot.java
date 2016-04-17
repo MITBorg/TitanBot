@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLSocketFactory;
 import javax.script.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
@@ -49,6 +50,22 @@ public final class TitanBot {
     private static final Logger LOGGER = LoggerFactory.getLogger(TitanBot.class);
     private static final RateLimiter RATE_LIMITER = RateLimiter.create(Properties.getValueAsDouble("rate"));
     private static Connection databaseConnection;
+    public static final String VERSION;
+
+    static {
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+        String version;
+        try {
+            engine.getBindings(ScriptContext.ENGINE_SCOPE).put("j", new String(Files.readAllBytes(Paths.get("package" +
+                    ".json")), StandardCharsets.UTF_8));
+            version = (String) engine.eval("JSON.parse(j).version");
+        } catch (IOException | ScriptException e) {
+            TitanBot.LOGGER.warn("Could not fetch version number from package.json, continuing anyway.", e);
+            version = "Unknown";
+        }
+
+        VERSION = version;
+    }
 
     /**
      * Get bot logger instance.
@@ -188,7 +205,7 @@ public final class TitanBot {
         Configuration.Builder configBuilder = new Configuration.Builder()
                 .setName(Properties.getValue("bot.nick"))
                 .setLogin(Properties.getValue("bot.username"))
-                .setVersion(Properties.getValue("bot.version"))
+                .setVersion(TitanBot.VERSION)
                 .setRealName(Properties.getValue("bot.real_name"))
                 .setSocketFactory(new UtilSSLSocketFactory().trustAllCertificates())
                 .setAutoNickChange(true)
@@ -241,6 +258,7 @@ public final class TitanBot {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get("modules"))) {
             for (Path p : stream) {
                 engine = engineManager.getEngineByName("nashorn");
+                engine.eval(new String(Files.readAllBytes(Paths.get("lib/jvm-npm.js")), StandardCharsets.UTF_8));
                 engine.getBindings(ScriptContext.ENGINE_SCOPE).put("engine", engine);
                 engine.getBindings(ScriptContext.ENGINE_SCOPE).put("exports", ((Invocable) engine).invokeMethod(
                         engine.eval("JSON"), "parse", "{}"));
