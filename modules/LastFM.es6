@@ -2,10 +2,13 @@ import _ from 'lodash';
 import moment from 'moment';
 
 class LastFM {
-    constructor() {
-    }
-
     register() {
+        this.helper = Java.type('mitb.util.PIrcBotXHelper');
+        this.Properties = Java.type('mitb.util.Properties');
+        this.StringHelper = Java.type('mitb.util.StringHelper');
+
+        const AsyncHttpClient = Java.type('com.ning.http.client.AsyncHttpClient');
+        this.asyncHttpClient = new AsyncHttpClient();
     }
 
     getHelp(event) {
@@ -19,7 +22,7 @@ class LastFM {
     onCommand(commandEvent) {
         var args = Java.from(commandEvent.getArgs());
 
-        var callerNick = Java.type('mitb.util.PIrcBotXHelper').getNick(commandEvent.getSource());
+        var callerNick = this.helper.getNick(commandEvent.getSource());
 
         var cachedUsername = this.fetchCachedUsername(callerNick);
 
@@ -34,12 +37,7 @@ class LastFM {
         if (args.length < 2)
             return;
 
-        var AsyncHttpClient = Java.type('com.ning.http.client.AsyncHttpClient');
-        var Properties = Java.type('mitb.util.Properties');
-        var StringHelper = Java.type('mitb.util.StringHelper');
-
         var user = args[0];
-        var asyncHttpClient = new AsyncHttpClient();
         var template = null;
         var url = null;
 
@@ -50,9 +48,9 @@ class LastFM {
                 template = (ret) => {
                     if (!ret.user) return;
                     var signUp = moment.unix(ret.user.registered['unixtime']).calendar();
-                    return `${ret.user.name} has listened to ${StringHelper.wrapBold(ret.user.playcount)} songs since ${StringHelper.wrapBold(signUp)}.`;
+                    return `${ret.user.name} has listened to ${this.StringHelper.wrapBold(ret.user.playcount)} songs since ${this.StringHelper.wrapBold(signUp)}.`;
                 };
-                url = `https://ws.audioscrobbler.com/2.0/?method=user.getInfo&user=${user}&api_key=${Properties.getValue('lastfm.api_key')}&format=json`;
+                url = `https://ws.audioscrobbler.com/2.0/?method=user.getInfo&user=${user}&api_key=${this.Properties.getValue('lastfm.api_key')}&format=json`;
                 break;
 
             case 'current':
@@ -80,7 +78,7 @@ class LastFM {
                     _(ret.recenttracks.track).each((track, i) => {
                         if (i > amt - 1) return;
 
-                        str += StringHelper.wrapBold(`${track.artist['#text']} - ${track.name}`);
+                        str += this.StringHelper.wrapBold(`${track.artist['#text']} - ${track.name}`);
 
                         if (ret.recenttracks.track.length > 1 && i < ret.recenttracks.track.length - 1 && i < amt - 1) {
                             str += ' | ';
@@ -89,7 +87,7 @@ class LastFM {
 
                     return str;
                 };
-                url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${user}&api_key=${Properties.getValue('lastfm.api_key')}&format=json&limit=${amt}`;
+                url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${user}&api_key=${this.Properties.getValue('lastfm.api_key')}&format=json&limit=${amt}`;
                 break;
 
             case 'topartists':
@@ -109,7 +107,7 @@ class LastFM {
                 template = (ret) => {
                     var str = '';
                     var loop = [];
-                    var fmt = (item) => `${StringHelper.wrapBold(item.name)} (${item.playcount})`;
+                    var fmt = (item) => `${this.StringHelper.wrapBold(item.name)} (${item.playcount})`;
 
                     if (args[1].toLowerCase() == 'topartists') {
                         if (!ret.topartists.artist[0]) return;
@@ -121,7 +119,7 @@ class LastFM {
 
                         str = 'Top songs: ';
                         loop = ret.toptracks.track;
-                        fmt = (item) => `${StringHelper.wrapBold(`${item.name} - ${item.artist.name}`)} (${item.playcount})`;
+                        fmt = (item) => `${this.StringHelper.wrapBold(`${item.name} - ${item.artist.name}`)} (${item.playcount})`;
                     }
 
                     _(loop).each((item, i) => {
@@ -135,14 +133,14 @@ class LastFM {
                     return str;
                 };
 
-                url = `https://ws.audioscrobbler.com/2.0/?method=user.get${args[1].toLowerCase() == 'topartists' ? 'topartists' : 'toptracks'}&user=${user}&api_key=${Properties.getValue('lastfm.api_key')}&format=json&limit=5&period=${time}`;
+                url = `https://ws.audioscrobbler.com/2.0/?method=user.get${args[1].toLowerCase() == 'topartists' ? 'topartists' : 'toptracks'}&user=${user}&api_key=${this.Properties.getValue('lastfm.api_key')}&format=json&limit=5&period=${time}`;
                 break;
 
             default:
                 return;
         }
 
-        asyncHttpClient.prepareGet(url)
+        this.asyncHttpClient.prepareGet(url)
             .execute(new com.ning.http.client.AsyncCompletionHandler({
                 onCompleted: (response) => {
                     var json = JSON.parse(response.getResponseBody());
@@ -151,8 +149,7 @@ class LastFM {
                     if (resp) {
                         helper.respond(commandEvent, resp);
                     }
-                },
-                onThrowable: (t) => {}
+                }
             }));
     }
 

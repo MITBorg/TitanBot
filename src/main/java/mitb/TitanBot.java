@@ -252,13 +252,17 @@ public final class TitanBot {
         Bindings bindings = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
         bindings.put("helper", new ScriptingHelper());
 
-        engine.eval(new String(Files.readAllBytes(Paths.get("lib/babel-standalone.js")), StandardCharsets.UTF_8));
+        engine.eval(new String(Files.readAllBytes(Paths.get("node_modules", "babel-standalone", "babel.js")),
+                StandardCharsets.UTF_8));
         ScriptEngine babelEngine = engine;
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get("modules"))) {
             for (Path p : stream) {
                 engine = engineManager.getEngineByName("nashorn");
-                engine.eval(new String(Files.readAllBytes(Paths.get("lib/jvm-npm.js")), StandardCharsets.UTF_8));
+                engine.eval(new String(Files.readAllBytes(Paths.get("node_modules", "babel-polyfill", "dist",
+                        "polyfill.js")), StandardCharsets.UTF_8));
+                engine.eval(new String(Files.readAllBytes(Paths.get("node_modules", "jvm-npm", "src", "main",
+                        "javascript", "jvm-npm.js")), StandardCharsets.UTF_8));
                 engine.getBindings(ScriptContext.ENGINE_SCOPE).put("engine", engine);
                 engine.getBindings(ScriptContext.ENGINE_SCOPE).put("exports", ((Invocable) engine).invokeMethod(
                         engine.eval("JSON"), "parse", "{}"));
@@ -266,7 +270,7 @@ public final class TitanBot {
                 if (p.toString().endsWith(".js")) {
                     engine.eval(Files.newBufferedReader(p));
                 } else if (p.toString().endsWith(".es6")) {
-                    String source = new String(Files.readAllBytes(p));
+                    String source = new String(Files.readAllBytes(p), StandardCharsets.UTF_8);
                     babelEngine.getBindings(ScriptContext.ENGINE_SCOPE).put("source", source);
                     String transform = (String) babelEngine.eval("Babel.transform(source, {presets: ['es2015']}).code");
                     engine.eval(transform);

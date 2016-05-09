@@ -34,7 +34,7 @@ class UrbanDictionary {
             var custom = false;
         }
 
-        var term = Java.type('com.google.common.base.Joiner').on(' ').join(args).trim().toLowerCase();
+        var term = Java.from(args).join(' ').trim().toLowerCase();
         var result = this.cache[term + res];
 
         if (result != null) {
@@ -68,8 +68,7 @@ class UrbanDictionary {
                         var position = custom ? ` [at ${res + 1}]` : '';
                         helper.respond(commandEvent, `There are no entries for: ${term + position}`);
                     }
-                },
-                onThrowable: (t) => {}
+                }
             }));
     }
 }

@@ -1,4 +1,4 @@
-class SedReplacement {
+class Sed {
     constructor() {
         this.cache = {};
         this.regex = new RegExp('^(?:s/((?:[^\\\\/]|\\\\.)*)/((?:[^\\\\/]|\\\\.)*)/((?:g|i|\\d+)*))(?:;s/((?:[^\\\\/]|\\\\.)*)/((?:[^\\\\/]|\\\\.)*)/((?:g|i|\\d+)*))*$');
@@ -50,20 +50,33 @@ class SedReplacement {
             if (!this.cache.hasOwnProperty(callerNick))
                 this.cache[callerNick] = {};
 
-            this.cache[callerNick][channel] = originalMsg;
+            if (!this.cache[callerNick].hasOwnProperty(channel))
+                this.cache[callerNick][channel] = [];
+
+            if (this.cache[callerNick][channel].length > 2)
+                this.cache[callerNick][channel].splice(0, 1);
+
+            this.cache[callerNick][channel].push(originalMsg);
             return;
         }
 
         if (!this.cache.hasOwnProperty(targeted || callerNick) || !this.cache[targeted || callerNick].hasOwnProperty(channel))
             return;
 
-        msg = this.cache[targeted || callerNick][channel].replace(new RegExp(matches[1], matches[3]), matches[2]);
+        let regex = new RegExp(matches[1], matches[3]);
+        found = false;
 
-        if (matches[4] != null && matches[5] != null)
-            msg = msg.replace(new RegExp(matches[4], matches[6]), matches[5]);
+        for (let cached of this.cache[targeted || callerNick][channel].reverse()) {
+            if (regex.test(cached)) {
+                found = true;
+                msg = cached.replace(regex, matches[2]);
+                break;
+            }
+        }
 
-        event.getSource().respondWith(`${targeted ? `${callerNick} thinks ${targeted}` : callerNick} meant: ${msg}`);
+        if (found)
+            event.getSource().respondWith(`${targeted ? `${callerNick} thinks ${targeted}` : callerNick} meant: ${msg}`);
     }
 }
 
-export default new SedReplacement();
+export default new Sed();

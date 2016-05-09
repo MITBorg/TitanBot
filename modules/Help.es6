@@ -20,7 +20,7 @@ class Help {
     }
 
     sendModuleHelp(commandEvent) {
-        var moduleName = _.camelCase(Java.type('com.google.common.base.Joiner').on(' ').join(commandEvent.getArgs()).trim()).toLowerCase();
+        var moduleName = _.camelCase(Java.from(commandEvent.getArgs()).join(' ').trim()).toLowerCase();
 
         _.each(Java.type('mitb.TitanBot').MODULES, (module) => {
             if (module instanceof Java.type('mitb.module.ScriptCommandModule')) {

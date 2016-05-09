@@ -2,6 +2,13 @@ import moment from 'moment';
 
 class Commit {
     register() {
+        this.StringHelper = Java.type('mitb.util.StringHelper');
+        this.URL = Java.type('java.net.URL');
+        this.GitIO = Java.type('mitb.util.GitIO');
+        this.Properties = Java.type('mitb.util.Properties');
+
+        const AsyncHttpClient = Java.type('com.ning.http.client.AsyncHttpClient');
+        this.asyncHttpClient = new AsyncHttpClient();
     }
 
     getHelp(event) {
@@ -13,12 +20,7 @@ class Commit {
     }
 
     onCommand(commandEvent) {
-        var AsyncHttpClient = Java.type('com.ning.http.client.AsyncHttpClient');
-        var StringHelper = Java.type('mitb.util.StringHelper');
-        var URL = Java.type('java.net.URL');
-        var asyncHttpClient = new AsyncHttpClient();
-
-        asyncHttpClient.prepareGet(`https://api.github.com/repos/${Java.type('mitb.util.Properties').getValue('repo')}/commits`)
+        this.asyncHttpClient.prepareGet(`https://api.github.com/repos/${this.Properties.getValue('repo')}/commits`)
             .addHeader('Accept', 'application/vnd.github.v3+json')
             .execute(new com.ning.http.client.AsyncCompletionHandler({
                 onCompleted: (response) => {
@@ -26,16 +28,15 @@ class Commit {
 
                     if (!json) return;
 
-                    var short = Java.type('mitb.util.GitIO').shorten(new URL(json.html_url)).toString();
+                    var short = this.GitIO.shorten(new this.URL(json.html_url)).toString();
                     var summary = json.commit.message.split('\n')[0];
 
                     if (summary > 70)
                         summary = summary.substr(0, 70) + '...';
 
                     var date = moment(json.commit.committer.date).fromNow();
-                    helper.respond(commandEvent, `${StringHelper.wrapBold(json.sha.substr(0, 7))}: ${summary} - ${json.commit.author.name} (${date}) ${short}`);
-                },
-                onThrowable: (t) => {}
+                    helper.respond(commandEvent, `${this.StringHelper.wrapBold(json.sha.substr(0, 7))}: ${summary} - ${json.commit.author.name} (${date}) ${short}`);
+                }
             }));
     }
 }
