@@ -66,13 +66,17 @@ class Sed {
         let regex = new RegExp(matches[1], matches[3]);
         found = false;
 
-        for (let cached of this.cache[targeted || callerNick][channel].reverse()) {
+        this.cache[targeted || callerNick][channel].reverse();
+
+        for (let cached of this.cache[targeted || callerNick][channel]) {
             if (regex.test(cached)) {
                 found = true;
                 msg = cached.replace(regex, matches[2]);
                 break;
             }
         }
+
+        this.cache[targeted || callerNick][channel].reverse();
 
         if (found)
             event.getSource().respondWith(`${targeted ? `${callerNick} thinks ${targeted}` : callerNick} meant: ${msg}`);
