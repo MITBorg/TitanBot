@@ -35,7 +35,7 @@ class Commit {
                         summary = summary.substr(0, 70) + '...';
 
                     var date = moment(json.commit.committer.date).fromNow();
-                    helper.respond(commandEvent, `${this.StringHelper.wrapBold(json.sha.substr(0, 7))}: ${summary} - ${json.commit.author.name} (${date}) ${short}`);
+                    helper.respond(commandEvent, `${this.StringHelper.wrapBold(json.sha.substr(0, 7))}: ${summary} - ${json.author.login} (${date}) ${short}`);
                 }
             }));
     }
