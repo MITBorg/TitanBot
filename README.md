@@ -32,3 +32,4 @@ An IRC bot developed for the moparisthebest community using Java 8 and Maven. Mo
 * [bootnecklad](https://github.com/bootnecklad)
 * [PureCS](https://github.com/PureCS)
 * [dg36](https://github.com/dg36)
+* [tehspede](https://github.com/tehspede)

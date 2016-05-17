@@ -9,6 +9,7 @@ class Commit {
 
         const AsyncHttpClient = Java.type('com.ning.http.client.AsyncHttpClient');
         this.asyncHttpClient = new AsyncHttpClient();
+        this.githubUrl = `https://api.github.com/repos/${this.Properties.getValue('repo')}/commits`;
     }
 
     getHelp(event) {
@@ -20,11 +21,18 @@ class Commit {
     }
 
     onCommand(commandEvent) {
-        this.asyncHttpClient.prepareGet(`https://api.github.com/repos/${this.Properties.getValue('repo')}/commits`)
+        var json;
+        var args = commandEvent.getArgs();
+        var url = this.githubUrl + (args.length ? `/${args[0]}` : '');
+        this.asyncHttpClient.prepareGet(url)
             .addHeader('Accept', 'application/vnd.github.v3+json')
             .execute(new com.ning.http.client.AsyncCompletionHandler({
                 onCompleted: (response) => {
-                    var json = JSON.parse(response.getResponseBody())[0];
+                    if (args.length) {
+                        json = JSON.parse(response.getResponseBody());
+                    } else {
+                        json = JSON.parse(response.getResponseBody())[0];
+                    }
 
                     if (!json) return;
 
