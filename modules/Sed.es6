@@ -1,7 +1,14 @@
 class Sed {
     constructor() {
         this.cache = {};
-        this.regex = new RegExp('^(?:s/((?:[^\\\\/]|\\\\.)*)/((?:[^\\\\/]|\\\\.)*)/((?:g|i|\\d+)*))(?:;s/((?:[^\\\\/]|\\\\.)*)/((?:[^\\\\/]|\\\\.)*)/((?:g|i|\\d+)*))*$');
+        this.regex = new RegExp('^sed (.*)$');
+
+        this.ProcessBuilder = Java.type('java.lang.ProcessBuilder');
+        this.BufferedReader = Java.type('java.io.BufferedReader');
+        this.BufferedWriter = Java.type('java.io.BufferedWriter');
+        this.InputStreamReader = Java.type('java.io.InputStreamReader');
+        this.OutputStreamWriter = Java.type('java.io.OutputStreamWriter');
+        this.Collectors = Java.type('java.util.stream.Collectors');
     }
 
     register() {
@@ -63,15 +70,33 @@ class Sed {
         if (!this.cache.hasOwnProperty(targeted || callerNick) || !this.cache[targeted || callerNick].hasOwnProperty(channel))
             return;
 
-        let regex = new RegExp(matches[1], matches[3]);
+        //let regex = new RegExp(matches[1], matches[3]);
+        let command = matches[1];
         found = false;
 
         this.cache[targeted || callerNick][channel].reverse();
 
         for (let cached of this.cache[targeted || callerNick][channel]) {
-            if (regex.test(cached)) {
+            var pb = new this.ProcessBuilder('sed', command);
+            pb.redirectErrorStream(true);
+            var process = pb.start();
+
+            var input = process.getOutputStream();
+            var output = process.getInputStream();
+
+            var reader = new this.BufferedReader(new this.InputStreamReader(output));
+            var writer = new this.BufferedWriter(new this.OutputStreamWriter(input));
+
+            writer.write(cached);
+            writer.flush();
+            writer.close();
+
+            var newMsg = reader.lines().collect(this.Collectors.joining('\n'));
+            reader.close();
+
+            if (cached !== newMsg) {
                 found = true;
-                msg = cached.replace(regex, matches[2]);
+                msg = newMsg;
                 break;
             }
         }
