@@ -94,7 +94,7 @@ class Sed {
             var newMsg = reader.lines().collect(this.Collectors.joining('\n'));
             reader.close();
 
-            if (cached !== newMsg) {
+            if (cached !== newMsg && newMsg) {
                 found = true;
                 msg = newMsg;
                 break;
